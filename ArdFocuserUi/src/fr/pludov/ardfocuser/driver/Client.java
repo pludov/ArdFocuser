@@ -297,7 +297,7 @@ public class Client {
 			case GetRangeCommand:
 			{
 				ClientRequest response = new ClientRequest();
-				response.result = "R20000#";
+				response.result = "R200000#";
 				response.setDone();
 				return response;
 			}

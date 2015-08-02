@@ -432,6 +432,9 @@ public class Focuser {
 				try {
 					byte[] b = inputStream.readBytes(1);
 					c = (char)(((int)b[0]) & 0xff);
+					if (c == 0) {
+						continue;
+					}
 				} catch (SerialPortException e) {
 					e.printStackTrace();
 					focuser.ioError(this.inputStream, "Reader: " + e.getMessage());
@@ -468,12 +471,12 @@ public class Focuser {
 
 		private void emptyTrash() {
 			if (garbage.length() > 0) {
-/*				System.out.print("readed: ");
+				System.out.print("readed: ");
 				if (garbage.charAt(garbage.length() - 1) == '\n') {					
 					System.out.print(garbage.toString());
 				} else {
 					System.out.println(garbage.toString());
-				}*/
+				}
 				garbage.setLength(0);
 			}
 			
