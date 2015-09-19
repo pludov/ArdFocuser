@@ -36,6 +36,7 @@ opening_angle = 90-83.66;
 hauteur_externe = 21;
 
 debord_hauteur = 4;
+debord_width = 17;
 
 //epaisseur de la parois basse
 low_width = 7;
@@ -90,6 +91,12 @@ accroches = [
     [ 35, -75 ],
 ];
 
+// Les accroches sur la RAF
+accroches_main = [
+    accroches[0], accroches[1]
+];
+    
+
 accroches_capot = [
     [-22, -64],
     [3, -86.5],
@@ -109,6 +116,18 @@ stepper_angle_tol = 3; // +/- 5 deg pour l'accroche
 
 // Nombre de steps pour avoir une découpe (prévoir assez haut à la cible (100 ?)! 
 stepper_angle_step = 5;
+
+// http://www.conrad.fr/ce/fr/product/1303470/Embase-femelle-modulaire-RJ45-econ-connect-MEB88PST-embase-femelle-verticale-Ple-8-noir-1-pcs?ref=searchDetail
+rj45_l = 15.88;
+rj45_w = 15.36;
+rj45_h = 16.38;
+rj45_h_extra = rj45_h + 4;  // Avec une marge pour les fils
+rj45_oreille_bas = 2; // A quelle distance du bas commence l'oreille
+rj45_oreille_haut = 2; // A quelle distance du haut finit l'oreille
+rj45_oreille_debord = 1.25; // quelle largeur en plus sur le connecteur rj45
+rj45_oreille_recul = 2; // A quelle distance de la façade
+rj45_oreille_largeur = 1; 
+
 
 // La roue à filtre, coupée
 module roue_a_filtre() {
@@ -207,7 +226,7 @@ module corps() {
                     y0,
                     -opening_center_dist - 0.2, 
                     hauteur_externe +0.2])
-                cube([y1-y0, 15, debord_hauteur + capot_height - 0.2]);
+                cube([y1-y0, debord_width, debord_hauteur + capot_height /*- 0.2*/]);
             
         }
         
@@ -262,7 +281,7 @@ module StepMotor28BYJSurPatte() {
     StepMotor28BYJ();
 }
 // Le moteur
-*union() {
+union() {
 translate([accroche_moteur_x, accroche_moteur_y, low_width + stepper_height])
     rotate([0,0,stepper_angle - 90])
     StepMotor28BYJSurPatte();
@@ -502,11 +521,12 @@ module capot_clip()
 
 
 // Le capot
-*color("blue")
-render()
+
+module capot()
+color("blue")
 difference() {
     union() {
-        render()
+//        render()
         difference() {
             intersection() {
                 corps();
@@ -525,21 +545,103 @@ difference() {
             }
         }
         intersection() {
-            for(accroche_pt = accroches_capot) {
-                translate([accroche_pt[0], accroche_pt[1], -10])
-                cylinder(d=m3_diam + 3, $fn=64, h=100);
+            union() {
+                for(accroche_pt = accroches_capot) {
+                    translate([accroche_pt[0], accroche_pt[1], -10])
+                    cylinder(d=m3_diam + 3, $fn=64, h=100);
             
+                }
+                for(accroche_pt = accroches_main) {
+                    translate([accroche_pt[0], accroche_pt[1], -10])
+                    rotate([0,0, opening_angle])
+                    hexagon(m3_ecrou_size + 3, 200);
+                }
+                trou_rj45_place()
+                trou_rj45_support();
             }
             capot_clip();
         }
+        
+        
+        
     }
     for(accroche_pt = accroches_capot) {
         translate([accroche_pt[0], accroche_pt[1], -10])
             cylinder(d=m3_diam, $fn=64, h=100);
     }
+    for(accroche_pt = accroches_main) {
+        translate([accroche_pt[0], accroche_pt[1], hauteur_externe+debord_hauteur - 1])
+        cylinder(d=m3_diam, $fn=64, h=6);
+        
+        translate([accroche_pt[0], accroche_pt[1], hauteur_externe+debord_hauteur+ 2.2/2])
+        rotate([0,0, opening_angle])
+        hexagon(m3_ecrou_size, 2.2);
+    }
+    trou_rj45_place()
+    trou_rj45_retire();
+
 };
-intersection() {
-    translate([0,-53,0])
-    cylinder(d=15, h=50,$fn=64);
-    haut();
+
+rj45_trou_mur = 1.5;
+// Positionne les pièce du trou rj45
+module trou_rj45_place() 
+{
+        rotate([0,0, opening_angle])
+        translate([38.5 -rj45_h_extra,-opening_center_dist+debord_width-0.2, hauteur_externe + debord_hauteur])
+        scale([1,-1,1])
+        children();
 }
+
+// Exteririeur du trou rj45
+module trou_rj45_support()
+{
+                    cube([rj45_h_extra, 2 * rj45_trou_mur + 2 * rj45_oreille_debord + rj45_w,capot_height]);
+
+}
+
+// Extrusion pour le trou rj45
+module trou_rj45_retire()
+{
+    mur = rj45_trou_mur;
+    translate([rj45_h_extra - rj45_oreille_recul - rj45_oreille_largeur,mur,-capot_height + rj45_l])
+    cube([rj45_oreille_largeur,2 * rj45_oreille_debord + rj45_w,capot_height]);
+                
+    translate([rj45_h_extra / 2, mur + rj45_oreille_debord, -capot_height + rj45_l])
+    cube([rj45_h_extra / 2+1,rj45_w,capot_height]);
+                
+    translate([0 - 1, mur + rj45_oreille_debord, -capot_height + rj45_l + 1.4])
+    cube([rj45_h_extra - rj45_h/2 + 2,rj45_w,capot_height]);
+}
+
+module prise_rj45()
+{
+    
+    rotate([0,0, opening_angle])
+    translate([38.5,-opening_center_dist-1-0.2, hauteur_externe + debord_hauteur + rj45_l])
+    scale([1,-1,1])
+    rotate([180,0,0])
+    rotate([0,-90,0])
+    {
+        difference() {
+            union() {
+                cube([rj45_l, rj45_w, rj45_h]);
+                translate([rj45_oreille_bas,-rj45_oreille_debord,rj45_oreille_recul])
+                cube([rj45_l - rj45_oreille_bas - rj45_oreille_haut, rj45_w + 2 * rj45_oreille_debord, rj45_oreille_largeur]);
+            }
+            translate([4,1,-0.1])
+            cube([rj45_l - 5, rj45_w - 2, rj45_h - 4]);
+            translate([2,(rj45_w - 4 ) / 2,-0.1])
+            cube([3, 4, rj45_h - 4]);
+        }
+        color("grey")
+        for(i = [ 1,2,3,4]) {
+            translate([-5,i * rj45_w / 5,rj45_h - 4])
+            cube([5,0.7,0.7]);
+        }
+    }
+}
+//%render() 
+capot();
+//haut();
+
+prise_rj45();
