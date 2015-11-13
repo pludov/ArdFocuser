@@ -2,23 +2,30 @@ use <28BYJ-48.scad>;
 use <publicDomainGearV1.1.scad>;
 use <MCAD/shapes.scad>;
 
-
-// LPO: 9/9/2015 16:18, ajout de 0.3 de marge
-stepper_axe_meplat = 3.2+0.3;
-stepper_axe_diam = 5.1+0.4;
+// conclusion 10 sept:
+// Haut: profondeur écrou +1.5mm, ou alors, dans le bas aussi
+// Haut: prendre au moins 8 de diam pour le support hall (indicateur_diam_ext)
+// Haut & bas: Monter le moteur d'au moins 1.2 (stepper_height)
+// Haut : Hall: réduire la distance, agrandir les trous, séparer les 3 pins
+// fin conclusion 10 sept
+stepper_axe_meplat = 3.2;
+stepper_axe_diam = 5.1;
 
 // Ecrou de 3x30: http://www.leroymerlin.fr/v3/p/produits/lot-de-25-boulons-tete-cylindrique-en-acier-zingue-long-30-x-diam-3-mm-e125287
 // Extrusion pour les ecrous de 3
-m3_diam = 3.2 + 0.2;
 // FIXME: verifier
-m3_tete_diam = 5.5+0.4;
+m3_diam = 3.2;
+// FIXME: verifier
+m3_tete_diam = 6;
 // FIXME : verifier
-m3_tete_length = 2.5;
+m3_tete_length = 3;
+//
 // http://www.visseriefixations.fr/ecrous/ecrous-autofreines/ecrou-hexagonal-autofreine-bague-nylon/ecrou-nylstop-inox-a2-din-985.html
 // Prendre "s"
+// FIXME : verifier
 m3_ecrou_size = 5.5 + 0.3; // 6.01 / 2 + 0.15;
-
-m3_ecrou_length = 2.5;
+// FIXME : verifier
+m3_ecrou_length = 3;
 
 // Deux morceaux principaux : la fixation de courroie sur la roue principale
 // Celle ci doit être constituée de 5 partie qui devront être collée ensemble
@@ -36,7 +43,6 @@ opening_angle = 90-83.66;
 hauteur_externe = 21;
 
 debord_hauteur = 4;
-debord_width = 17;
 
 //epaisseur de la parois basse
 low_width = 7;
@@ -52,29 +58,32 @@ marge_carroussel = 2;
 level_carroussel = hauteur_externe - 9.5;
 width_carroussel = 4;
 
-diam_filter = 31.75 + 0.6;
-distant_filter_center = ray_ext_max / 2; //31.75 / 2 + 20;
+diam_filter = 31.75 + 0.3;
+distant_filter_center_min = 30;
+distant_filter_center_max = 32.4;
+
 gear_mm_per_tooth=2.33;
 gear_big_count = 145; // Il faudrait un multiple de 5 pour avoir des pièces identiques!
 gear_small_count = 24;
 gear_height = level_carroussel - low_width-0.8;
+echo("gear_height:", gear_height);
 // Le rayon au centre de la grosse roue 
 gear_inner_radius = 25;
 
 
+
 indicateur_center_distance = opening_center_dist / cos(opening_angle);
 indicateur_diam_ext = 8.4;
-longueur_support_indicateur = 2.6;
 
 // Le niveau bas du senseur
-sensor_low_level = level_carroussel + width_carroussel + 1.4;
+sensor_low_level = level_carroussel + width_carroussel + 0.4;
         
 // On va surelever le senseur de ça (prévoir de la colle...)
 magnet_hall_tolerance = 0.4;
 magnet_center_distance = indicateur_center_distance;
 magnet_diam = 4;
 magnet_height = 2;
-
+magnet_hall_support_width = 3;
 
 capot_width = 2;
 capot_height = 18;
@@ -89,13 +98,8 @@ accroches = [
     [ 30, -52 ],
     [ -6, -59 ],
     [ 35, -75 ],
+//    [ -18, -55 ]
 ];
-
-// Les accroches sur la RAF
-accroches_main = [
-    accroches[0], accroches[1]
-];
-    
 
 accroches_capot = [
     [-22, -64],
@@ -115,19 +119,7 @@ stepper_angle = -154 ;
 stepper_angle_tol = 3; // +/- 5 deg pour l'accroche
 
 // Nombre de steps pour avoir une découpe (prévoir assez haut à la cible (100 ?)! 
-stepper_angle_step = 5;
-
-// http://www.conrad.fr/ce/fr/product/1303470/Embase-femelle-modulaire-RJ45-econ-connect-MEB88PST-embase-femelle-verticale-Ple-8-noir-1-pcs?ref=searchDetail
-rj45_l = 15.88;
-rj45_w = 15.36;
-rj45_h = 16.38;
-rj45_h_extra = rj45_h + 4;  // Avec une marge pour les fils
-rj45_oreille_bas = 2; // A quelle distance du bas commence l'oreille
-rj45_oreille_haut = 2; // A quelle distance du haut finit l'oreille
-rj45_oreille_debord = 1.25; // quelle largeur en plus sur le connecteur rj45
-rj45_oreille_recul = 2; // A quelle distance de la façade
-rj45_oreille_largeur = 1; 
-
+stepper_angle_step = 2;
 
 // La roue à filtre, coupée
 module roue_a_filtre() {
@@ -144,7 +136,7 @@ module roue_a_filtre() {
         }
         translate([0, 0, low_width])
         cylinder(r=ray_carroussel+marge_carroussel, h=hauteur_externe - low_width - high_width);
-        translate([distant_filter_center, 0, -1]) 
+        translate([distant_filter_center_max, 0, -1]) 
             cylinder(r = 42/2, h = hauteur_externe + 2);
         
         // L'ouverture pour controle manuel
@@ -204,10 +196,12 @@ module hallSensor() {
     }
 }
 
+corps_y0 = -39.5;
+corps_y1 = 38.5;
 module corps() {
     full_height = hauteur_externe + debord_hauteur + capot_height;
-    y0 = -39.5;
-    y1 = 38.5;
+    y0 = corps_y0;
+    y1 = corps_y1;
     rotate([0,0, opening_angle])
     difference() {
         union() {
@@ -226,28 +220,21 @@ module corps() {
                     y0,
                     -opening_center_dist - 0.2, 
                     hauteur_externe +0.2])
-                cube([y1-y0, debord_width, debord_hauteur + capot_height /*- 0.2*/]);
+                cube([y1-y0, 15, debord_hauteur + capot_height - 0.2]);
+            
+            
             
         }
-        
-        rabot = 4;
-        translate([ 
-                0,
-                -opening_center_dist - 0.2, 
-                low_width +0.2])
-        {
+        translate([0,-opening_center_dist, low_width])
             difference() {
-                cube([100,2*rabot,2*rabot], center =true);
+                rabot = 4;
+                cube([100, 2 * rabot, 2 * rabot], center=true);
                 translate([0,-rabot,rabot])
                 rotate([0,90,0])
-                translate([0,0,-100])
-                cylinder(r=rabot, h=200, $fn=32);
+                translate([0,0,-52])
+                cylinder(r=rabot, h=104, $fn=64);
             }
-            
-        }
     }
-    
-    
 }
 
 
@@ -261,11 +248,18 @@ module corps() {
         gear(gear_mm_per_tooth, gear_big_count, gear_height, 0);
         
         for(i = [0:4]) {
-            translate([
-                distant_filter_center * cos(i*72),
-                distant_filter_center * sin(i*72),
-                -20])
-            cylinder(d = diam_filter, h = 40,$fn=128);
+            hull() {
+                translate([
+                    distant_filter_center_min * cos(i*72),
+                    distant_filter_center_min * sin(i*72),
+                    -20])
+                cylinder(d = diam_filter, h = 40,$fn=256);
+                translate([
+                    distant_filter_center_max * cos(i*72),
+                    distant_filter_center_max * sin(i*72),
+                    -20])
+                cylinder(d = diam_filter, h = 40,$fn=256);
+            }
         }
         translate([0,0,-20])
         cylinder(r = gear_inner_radius, h = 40,$fn=128);
@@ -281,7 +275,7 @@ module StepMotor28BYJSurPatte() {
     StepMotor28BYJ();
 }
 // Le moteur
-union() {
+*union() {
 translate([accroche_moteur_x, accroche_moteur_y, low_width + stepper_height])
     rotate([0,0,stepper_angle - 90])
     StepMotor28BYJSurPatte();
@@ -294,9 +288,9 @@ translate([accroche_moteur_x,accroche_moteur_y, 0])
     rotate([0, 0, stepper_angle])
     translate([35/2,-8, 0])
     {
-        small_gear_min = low_width + 1.0;
+        small_gear_min = low_width + 1.2;
         small_gear_max = level_carroussel - 0.4;
-        small_gear_cylinder_max= low_width + stepper_height - 2.4;
+        small_gear_cylinder_max= low_width + stepper_height - 2.0;
         small_gear_height = small_gear_max - small_gear_min;
         
         difference() {
@@ -377,123 +371,129 @@ difference() {
     for(accroche_pt = accroches_capot) {
         translate([accroche_pt[0], accroche_pt[1],low_width + 6]) {
             cylinder(d=m3_diam, $fn=64, h=100);
+            
         }
-        translate([accroche_pt[0], accroche_pt[1],stepper_height + low_width - 2.1]) {
-            translate([0,0,2.2/2])
-            hexagon(m3_ecrou_size, 2.2);
+        profondeur_ecrou = 2;
+        translate([accroche_pt[0], accroche_pt[1],stepper_height + low_width - profondeur_ecrou]) {
+            translate([0,0,(profondeur_ecrou+0.5)/2])
+            hexagon(m3_ecrou_size, profondeur_ecrou + 0.5);    
         }
+        
     }
 }
 
 }
 
 // Le haut
-module haut() {
-    color("green")
-    difference() {
-        union() {
-            intersection() {
-                corps();
-                translate([-200, -200,stepper_height + low_width + 0.1])
-                cube([400,400,hauteur_externe + debord_hauteur - (stepper_height + low_width) - 0.1]);
-            }
-            
-            // Le support pour le hall (sert juste de guide, le hall devra être collé)
-            translate([
-                    0,
-                    -magnet_center_distance,
-                    sensor_low_level
-                    ])
-            rotate([0, 0, opening_angle])
-            difference() {
-                hull() {
-                    intersection() {
-                        cylinder(d=indicateur_diam_ext - 0.4,h=hauteur_externe + debord_hauteur - sensor_low_level, $fn=64);
-                        translate([0,50,0])
-                        cube([100,100,100], center=true);
-                    }
-                    translate([0, -longueur_support_indicateur, 0])
-                    translate([-(indicateur_diam_ext - 0.4)/2,0,0])
-                    cube([indicateur_diam_ext - 0.4, 0.1, hauteur_externe + debord_hauteur - sensor_low_level]);
-                }
-                rotate([0,0,-90])
-                translate([-3.6/2, -4.7/2, -0.1])
-                cube([10, 4.7, 1.5 + 0.2]);
-            }
-            
-            // Le support pour le hall (sert juste de guide, le hall devra être collé)
-            /*translate([
-                    0,
-            -magnet_center_distance,
-                    
-                    level_carroussel + width_carroussel + gear_height + magnet_hall_tolerance + 0.6])
-            rotate([0,0,180])
-            difference() {
-                translate([-4.4/2, -5.5/2, 0])
-                cube([10, 5.5, 5]);
-                
-                translate([-3.6/2, -4.7/2, -0.1])
-                cube([10, 4.7, 1.5 - 0.6 + 0.1]);
-            }*/
+*rotate([180,0,0])
+color("cyan")
+difference() {
+    union() {
+        intersection() {
+            corps();
+            translate([-200, -200,stepper_height + low_width + 0.1])
+            cube([400,400,hauteur_externe + debord_hauteur - (stepper_height + low_width) - 0.1]);
         }
         
-        // Les trous pour le senseur hall (2mm, de quoi faire une soudure...
-        translate([0,
-                    -magnet_center_distance,
-                    0])
-        {
+        
+        // Le support pour le hall (sert juste de guide, le hall devra être collé)
+        
+        translate([
+                0,
+                -magnet_center_distance,
+                sensor_low_level
+                ])
+        rotate([0, 0, opening_angle])
+        difference() {
+            hull() {
+                intersection() {
+                    cylinder(d=indicateur_diam_ext - 0.4,h=hauteur_externe + debord_hauteur - sensor_low_level, $fn=64);
+                    translate([0,50,0])
+                    cube([100,100,100], center=true);
+                }
+                    
+                translate([0, -magnet_hall_support_width, 0])
+                translate([-(indicateur_diam_ext - 0.4)/2,0,0])
+                cube([indicateur_diam_ext - 0.4, 0.1, hauteur_externe + debord_hauteur - sensor_low_level]);
+            }
+            rotate([0,0,-90])
+            translate([-3.6/2, -4.7/2, -0.1])
+            cube([10, 4.7, 1.5 + 0.2]);
+        }
+        
+        // Le support pour le hall (sert juste de guide, le hall devra être collé)
+        /*translate([
+                0,
+        -magnet_center_distance,
+                
+                level_carroussel + width_carroussel + gear_height + magnet_hall_tolerance + 0.6])
+        rotate([0,0,180])
+        difference() {
+            translate([-4.4/2, -5.5/2, 0])
+            cube([10, 5.5, 5]);
+            
+            translate([-3.6/2, -4.7/2, -0.1])
+            cube([10, 4.7, 1.5 - 0.6 + 0.1]);
+        }*/
+    }
+    
+    // Les trous pour le senseur hall (2mm, de quoi faire une soudure...
+    translate([0,
+                -magnet_center_distance,
+                0])
+    {
+        rotate([0, 0, opening_angle]) {
             tol_x = 0.6;
             tol_y = 0.1;
-            rotate([0, 0, opening_angle]) {
-                 translate([0, -longueur_support_indicateur - 1.8, 0])
-                 cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
-                 
-                 translate([-1.27, -longueur_support_indicateur, 0])
-                 cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
+             translate([0, -magnet_hall_support_width - 2, 0])
+             cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
+             
+             translate([-1.27, -magnet_hall_support_width, 0])
+             cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
 
-                 translate([1.27, -longueur_support_indicateur, 0])
-                 cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
+             translate([1.27, -magnet_hall_support_width, 0])
+             cube([0.7 + tol_x, 0.7 + tol_y, 100], center = true);
 
-            }
         }
-        
-        // Les visses du capot
-        for(accroche_pt = accroches_capot) {
-            translate([accroche_pt[0], accroche_pt[1],0]) {
-                cylinder(d=m3_diam, $fn=64, h=100);
-                translate([0,0, stepper_height + low_width])
-                hexagon(m3_ecrou_size, 0.2 + m3_ecrou_length);
-            }
+    }
+    
+    // Les visses du capot
+    for(accroche_pt = accroches_capot) {
+        translate([accroche_pt[0], accroche_pt[1],0]) {
+            cylinder(d=m3_diam, $fn=64, h=100);
+            translate([0,0, stepper_height + low_width])
+            hexagon(m3_ecrou_size, 0.2 + m3_ecrou_length);
         }
+    }
 
-        
-        // La place pour le moteur... on fait tout tourner
-        translate([accroche_moteur_x,accroche_moteur_y, 0])
-        for(vi = [-stepper_angle_step : stepper_angle_step])
-            rotate([0, 0, stepper_angle + stepper_angle_tol * vi / stepper_angle_step])
-            {
-                translate([35/2, 0, 0])
-                cylinder(d=30, h=100, $fn=64);
-                
-                hull() {
-                    translate([0, 0, 0])
-                    cylinder(d=8, h=100, $fn=64);
-                
-                    translate([35, 0, 0])
-                    cylinder(d=8, h=100, $fn=64);
-                }
-                
-                translate([35/2 - 17 / 2, 12, 0])
-                cube([17,7,100]);
+    
+    // La place pour le moteur... on fait tout tourner
+    translate([accroche_moteur_x,accroche_moteur_y, 0])
+    for(vi = [-stepper_angle_step : stepper_angle_step])
+        rotate([0, 0, stepper_angle + stepper_angle_tol * vi / stepper_angle_step])
+        {
+            translate([35/2, 0, 0])
+            cylinder(d=30, h=100, $fn=64);
+            
+            hull() {
+                translate([0, 0, 0])
+                cylinder(d=8, h=100, $fn=64);
+            
+                translate([35, 0, 0])
+                cylinder(d=8, h=100, $fn=64);
             }
             
+            translate([35/2 - 17 / 2, 12, 0])
+            cube([17,7,100]);
+        }
         
-        for(accroche_pt = accroches) {
-            translate([accroche_pt[0], accroche_pt[1], -10])
-                cylinder(d=m3_diam, $fn=64, h=100);
-        }   
-    };
-}
+    
+    for(accroche_pt = accroches) {
+        translate([accroche_pt[0], accroche_pt[1], -10])
+            cylinder(d=m3_diam, $fn=64, h=100);
+    }   
+};
+
 
 
 // Le capteur a effet hall
@@ -505,11 +505,72 @@ translate([0,0,0.8]) // Avoir le senseur à partir de 0
 rotate([180, 0, 0])
 hallSensor();
 
+
+din_margin = 0.4;
+
+din_face_y = 15.7 + din_margin;
+din_back_y = 16.7 + din_margin;
+din_back_height_z_1 = 5.4;
+din_back_height_z_2 = 8;
+din_face_x = 15.3 + din_margin;
+din_z = 16.3;
+din_oreille_z_level = 11.1 - din_margin / 2;
+din_oreille_z = 1.3 + din_margin;
+din_oreille_marge_y = 0.8;
+din_oreille_x = (17.8 + 2 * din_margin - din_face_x) / 2;
+
+module din8()
+{
+    // x : width
+    // y : height
+    // z : profondeur
+    cube([din_face_x, din_face_y, din_z]);
+    hull() {
+        cube([din_face_x, din_back_y,din_back_height_z_1]);
+        translate([0, 0, din_back_height_z_2])
+        cube([din_face_x, din_face_y,0.1]);
+    }
+    translate([-din_oreille_x,din_oreille_marge_y, din_oreille_z_level])
+    cube([2 * din_oreille_x + din_face_x,
+        din_face_y - 2 * din_oreille_marge_y, din_oreille_z]);
+        
+
+
+    // Un espace pour les cable
+    color("blue")
+    translate([0,0,-12])
+    cube([din_face_x, din_back_y, 12]);
+}
+
+module din8pos()
+{
+    rotate([0,0, opening_angle])
+    translate([corps_y0, -39, hauteur_externe+debord_hauteur])
+    translate([0, 0, din_face_x])
+    rotate([0, 90, 0])
+    rotate([180,0, 0])
+    translate([0, 0, -din_oreille_z_level])
+    children();
+}
+
+/*
+*rotate([180,0,0])
+rotate([0,0, opening_angle])
+translate([corps_y0, -39, hauteur_externe+debord_hauteur])
+translate([0, 0, din_face_x])
+rotate([0, 90, 0])
+rotate([180,0, 0])
+translate([0, 0, -din_oreille_z_level])
+*/
+*rotate([180,0,0])
+din8pos()
+din8();
+
 // Prise minidin8p
-*translate([40,-68,hauteur_externe + debord_hauteur])
-rotate([0,0,70])
-translate([-12/2,0,0])
-cube([12,13,12]);
+//*translate([40,-68,hauteur_externe + debord_hauteur])
+//rotate([0,0,70])
+//translate([-12/2,0,0])
+//cube([12,13,12]);
 
 
 module capot_clip()
@@ -519,14 +580,20 @@ module capot_clip()
 
 }
 
-
 // Le capot
-
-module capot()
+rotate([180,0,0])
 color("blue")
+render()
 difference() {
     union() {
-//        render()
+        x_marge = capot_height - din_face_x;
+        din8pos()
+            translate([-x_marge, -3, 0.1])
+            {
+                cube([din_face_x + x_marge - 0.02, din_back_y + 6, din_z - 0.2]);
+                cube([din_face_x + x_marge - 0.02, din_back_y + 9, 5.2]);
+            };
+        render()
         difference() {
             intersection() {
                 corps();
@@ -545,103 +612,19 @@ difference() {
             }
         }
         intersection() {
-            union() {
-                for(accroche_pt = accroches_capot) {
-                    translate([accroche_pt[0], accroche_pt[1], -10])
-                    cylinder(d=m3_diam + 3, $fn=64, h=100);
+            for(accroche_pt = accroches_capot) {
+                translate([accroche_pt[0], accroche_pt[1], -10])
+                cylinder(d=m3_diam + 3, $fn=64, h=100);
             
-                }
-                for(accroche_pt = accroches_main) {
-                    translate([accroche_pt[0], accroche_pt[1], -10])
-                    rotate([0,0, opening_angle])
-                    hexagon(m3_ecrou_size + 3, 200);
-                }
-                trou_rj45_place()
-                trou_rj45_support();
             }
             capot_clip();
         }
-        
-        
-        
     }
+    din8pos()
+        din8();
     for(accroche_pt = accroches_capot) {
         translate([accroche_pt[0], accroche_pt[1], -10])
             cylinder(d=m3_diam, $fn=64, h=100);
     }
-    for(accroche_pt = accroches_main) {
-        translate([accroche_pt[0], accroche_pt[1], hauteur_externe+debord_hauteur - 1])
-        cylinder(d=m3_diam, $fn=64, h=6);
-        
-        translate([accroche_pt[0], accroche_pt[1], hauteur_externe+debord_hauteur+ 2.2/2])
-        rotate([0,0, opening_angle])
-        hexagon(m3_ecrou_size, 2.2);
-    }
-    trou_rj45_place()
-    trou_rj45_retire();
-
 };
 
-rj45_trou_mur = 1.5;
-// Positionne les pièce du trou rj45
-module trou_rj45_place() 
-{
-        rotate([0,0, opening_angle])
-        translate([38.5 -rj45_h_extra,-opening_center_dist+debord_width-0.2, hauteur_externe + debord_hauteur])
-        scale([1,-1,1])
-        children();
-}
-
-// Exteririeur du trou rj45
-module trou_rj45_support()
-{
-                    cube([rj45_h_extra, 2 * rj45_trou_mur + 2 * rj45_oreille_debord + rj45_w,capot_height]);
-
-}
-
-// Extrusion pour le trou rj45
-module trou_rj45_retire()
-{
-    mur = rj45_trou_mur;
-    translate([rj45_h_extra - rj45_oreille_recul - rj45_oreille_largeur,mur,-capot_height + rj45_l])
-    cube([rj45_oreille_largeur,2 * rj45_oreille_debord + rj45_w,capot_height]);
-                
-    translate([rj45_h_extra / 2, mur + rj45_oreille_debord, -capot_height + rj45_l])
-    cube([rj45_h_extra / 2+1,rj45_w,capot_height]);
-                
-    translate([0 - 1, mur + rj45_oreille_debord, -capot_height + rj45_l + 1.4])
-    cube([rj45_h_extra - rj45_h/2 + 2,rj45_w,capot_height]);
-}
-
-module prise_rj45()
-{
-    
-    rotate([0,0, opening_angle])
-    translate([38.5,-opening_center_dist-1-0.2, hauteur_externe + debord_hauteur + rj45_l])
-    scale([1,-1,1])
-    rotate([180,0,0])
-    rotate([0,-90,0])
-    {
-        difference() {
-            union() {
-                cube([rj45_l, rj45_w, rj45_h]);
-                translate([rj45_oreille_bas,-rj45_oreille_debord,rj45_oreille_recul])
-                cube([rj45_l - rj45_oreille_bas - rj45_oreille_haut, rj45_w + 2 * rj45_oreille_debord, rj45_oreille_largeur]);
-            }
-            translate([4,1,-0.1])
-            cube([rj45_l - 5, rj45_w - 2, rj45_h - 4]);
-            translate([2,(rj45_w - 4 ) / 2,-0.1])
-            cube([3, 4, rj45_h - 4]);
-        }
-        color("grey")
-        for(i = [ 1,2,3,4]) {
-            translate([-5,i * rj45_w / 5,rj45_h - 4])
-            cube([5,0.7,0.7]);
-        }
-    }
-}
-//%render() 
-capot();
-//haut();
-
-prise_rj45();
