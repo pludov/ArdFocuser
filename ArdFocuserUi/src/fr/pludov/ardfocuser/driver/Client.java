@@ -174,24 +174,24 @@ public class Client {
 		FocuserRequestFromClient(String focuserCommand) {
 			request = new FocuserRequest(focuserCommand) {
 				@Override
-				void onStarted() {
+				public void onStarted() {
 					System.out.println(Client.this.toString() + ": starting command " + outMessage);
 				}
 				
 				@Override
-				void onReply(String reply) {
+				public void onReply(String reply) {
 					System.out.println(Client.this.toString() + ": Got reply for command " + outMessage + " : " + reply);
 					FocuserRequestFromClient.this.onReply(reply);
 				}
 				
 				@Override
-				void onError(String cause) {
+				public void onError(String cause) {
 					System.out.println(Client.this.toString() + ": Got error for command " + outMessage);
 					setError();
 				}
 				
 				@Override
-				void onCanceled(String cause) {
+				public void onCanceled(String cause) {
 					System.out.println(Client.this.toString() + ": Got canceled for command " + outMessage);
 					setError();
 				}
@@ -199,7 +199,7 @@ public class Client {
 			
 			System.out.println(Client.this.toString() + ": queuing command " + focuserCommand);
 
-			focuser.queueRequest(request);
+			focuser.queueRequest(request, false);
 		}
 		
 		abstract void onReply(String reply);
@@ -297,7 +297,8 @@ public class Client {
 			case GetRangeCommand:
 			{
 				ClientRequest response = new ClientRequest();
-				response.result = "R200000#";
+				
+				response.result = "R" + focuser.getMaxMotorPosition() + "#";
 				response.setDone();
 				return response;
 			}

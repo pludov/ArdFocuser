@@ -7,11 +7,11 @@ public abstract class FocuserRequest {
 		this.outMessage = message;
 	}
 	
-	abstract void onStarted();
+	public abstract void onStarted();
 	
-	abstract void onReply(String reply);
+	public abstract void onReply(String reply);
 	
-	abstract void onError(String cause);
+	public abstract void onError(String cause);
 
-	abstract void onCanceled(String cause);
+	public abstract void onCanceled(String cause);
 }

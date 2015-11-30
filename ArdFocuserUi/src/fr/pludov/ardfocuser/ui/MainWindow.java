@@ -3,9 +3,13 @@ package fr.pludov.ardfocuser.ui;
 import java.awt.BorderLayout;
 import java.awt.GraphicsConfiguration;
 import java.awt.HeadlessException;
+import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -26,6 +30,7 @@ public class MainWindow extends JFrame {
 	MainPanelDesign mpd;
 	
 	public MainWindow() throws HeadlessException {
+		setIconImages(loadImages("db.png", "db32.png", "db24.png", "db22.png", "db16.png"));
 		this.focuser = new Focuser();
 		setTitle("Arduino Focuser Control");
 		setLayout(new BorderLayout());
@@ -83,6 +88,16 @@ public class MainWindow extends JFrame {
 	}
 
 	
+	private static List<? extends Image> loadImages(String ... images)
+	{
+		List<Image> result = new ArrayList<>();
+		for(String fileName : images) {
+			String imagePath = "/" + MainWindow.class.getPackage().getName().replaceAll("\\.", "/") + "/" +  fileName;
+			ImageIcon imageicon = new ImageIcon(MainWindow.class.getResource(imagePath));
+			result.add(imageicon.getImage());
+		}
+		return result;
+	}
 	
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
@@ -98,4 +113,5 @@ public class MainWindow extends JFrame {
 			}
 		});
 	}
+	
 }

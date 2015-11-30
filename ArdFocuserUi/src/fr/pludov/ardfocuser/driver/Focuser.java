@@ -114,6 +114,8 @@ public class Focuser {
 			writeThread = null;
 		}
 		if (this.serialPort != null) {
+			Logger.log("Closing");
+			
 			final SerialPort toClose = this.serialPort;
 			this.serialPort = null;
 			try {
@@ -165,6 +167,8 @@ public class Focuser {
 		internalClose();
 		switchCurrentStatus(FocuserStatus.Disconnected);
 		discardRequests("closed by user");
+		
+		Logger.reset();
 		switchCurrentStatus(FocuserStatus.InitialHandshake);
 		try {
 			if (!commPort.openPort()) {
@@ -211,7 +215,7 @@ public class Focuser {
 	private void restartHandShake()
 	{
 		abortHandShake();
-		
+		Logger.log("Trying to connect");
 		handShake = commandHello + randomString((char)33, (char)127, 8);
 		writeThread.push(prefix + handShake + suffix);
 		handShakeTimer = new Timer(500, null);
@@ -220,8 +224,9 @@ public class Focuser {
 			
 			@Override
 			public void actionPerformed(ActionEvent arg0) {
-				int handShakeFailedMaxCount = 10;
+				int handShakeFailedMaxCount = 15;
 				handShakeFailedCount++;
+				Logger.log("Handshake failed");
 				System.out.println("handShake failed for " + handShake + "(" + handShakeFailedCount + "/" + handShakeFailedMaxCount + ")");
 				if (handShakeFailedCount >= handShakeFailedMaxCount) {
 					switchCurrentStatus(FocuserStatus.Disconnected);
@@ -305,11 +310,15 @@ public class Focuser {
 		this.battery = decodeVolt(status.substring(17, 17 + 3));
 		this.heater = decodePct(status.substring(20, 20 + 2));
 		
+		Logger.stateUpdated(this);
+		
 		listeners.getTarget().parametersChanged();
 	}
 	
 	private void closeWithError(String errorMessage)
 	{
+		Logger.log("Error: " + errorMessage);
+
 		internalClose();
 		switchCurrentStatus(FocuserStatus.Disconnected);
 		listeners.getTarget().broadcastError(errorMessage);
@@ -321,6 +330,7 @@ public class Focuser {
 		System.out.println("Protocol message: " + message);
 		if (this.currentStatus == FocuserStatus.InitialHandshake) {
 			if (message.equals(handShake)) {
+				Logger.log("Connection established");
 				System.out.println("handShake succeeded");
 				abortHandShake();
 				switchCurrentStatus(FocuserStatus.Connected);
@@ -358,6 +368,7 @@ public class Focuser {
 				// Message de status
 				decodeState(message);
 			} else {
+				Logger.log("Got reply: " + message);
 				if (currentRequest != null) {
 					FocuserRequest currentRequest = this.currentRequest;
 					this.currentRequest = null;
@@ -370,8 +381,9 @@ public class Focuser {
 		}
 	}
 
-	/** Peut être appellé depuis n'importe quel thread. Les evenements seront gérés dans le thread swing */
-	public void queueRequest(final FocuserRequest request)
+	/** Peut être appellé depuis n'importe quel thread. Les evenements seront gérés dans le thread swing 
+	 * @param discardPending TODO*/
+	public void queueRequest(final FocuserRequest request, final boolean discardPending)
 	{
 		SwingUtilities.invokeLater(new Runnable() {
 			
@@ -380,6 +392,9 @@ public class Focuser {
 				if (currentStatus != FocuserStatus.Connected) {
 					request.onError("Not connected");
 				} else {
+					if (discardPending) {
+						pendingRequests.clear();
+					}
 					pendingRequests.add(request);
 					startAnyRequest();
 				}
@@ -393,7 +408,7 @@ public class Focuser {
 		if (this.currentStatus != FocuserStatus.Connected) return;
 		if (this.pendingRequests.isEmpty()) return;
 		this.currentRequest = this.pendingRequests.remove(0);
-		
+		Logger.log("Request: " + this.currentRequest.outMessage);
 		this.writeThread.push(prefix + this.currentRequest.outMessage + suffix);
 		this.currentRequest.onStarted();
 	}
@@ -592,5 +607,9 @@ public class Focuser {
 
 	public void setHeater(Double heater) {
 		this.heater = heater;
+	}
+
+	public int getMaxMotorPosition() {
+		return 200000;
 	}
 }
