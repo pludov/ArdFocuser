@@ -32,10 +32,8 @@ namespace ASCOM.Arduino
             this.cmdCancel = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.picASCOM = new System.Windows.Forms.PictureBox();
-            this.label2 = new System.Windows.Forms.Label();
             this.chkTrace = new System.Windows.Forms.CheckBox();
-            this.comboBoxComPort = new System.Windows.Forms.ComboBox();
-            this.txtInitialPosition = new System.Windows.Forms.TextBox();
+            this.txtTcpPort = new System.Windows.Forms.TextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.lblInitPosInst = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).BeginInit();
@@ -69,9 +67,10 @@ namespace ASCOM.Arduino
             // 
             this.label1.Location = new System.Drawing.Point(12, 9);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(123, 31);
+            this.label1.Size = new System.Drawing.Size(288, 56);
             this.label1.TabIndex = 2;
-            this.label1.Text = "Construct your driver\'s setup dialog here.";
+            this.label1.Text = "Arduino ASCOM Driver connects to the ArduinoUI application. make sure the Applica" +
+                "tion is started and connected";
             // 
             // picASCOM
             // 
@@ -87,15 +86,6 @@ namespace ASCOM.Arduino
             this.picASCOM.Click += new System.EventHandler(this.BrowseToAscom);
             this.picASCOM.DoubleClick += new System.EventHandler(this.BrowseToAscom);
             // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(16, 59);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(58, 13);
-            this.label2.TabIndex = 5;
-            this.label2.Text = "Comm Port";
-            // 
             // chkTrace
             // 
             this.chkTrace.AutoSize = true;
@@ -106,40 +96,30 @@ namespace ASCOM.Arduino
             this.chkTrace.Text = "Trace on";
             this.chkTrace.UseVisualStyleBackColor = true;
             // 
-            // comboBoxComPort
+            // txtTcpPort
             // 
-            this.comboBoxComPort.FormattingEnabled = true;
-            this.comboBoxComPort.Location = new System.Drawing.Point(77, 56);
-            this.comboBoxComPort.Name = "comboBoxComPort";
-            this.comboBoxComPort.Size = new System.Drawing.Size(159, 21);
-            this.comboBoxComPort.TabIndex = 7;
-            this.comboBoxComPort.SelectedIndexChanged += new System.EventHandler(this.comboBox1_SelectedIndexChanged);
-            // 
-            // txtInitialPosition
-            // 
-            this.txtInitialPosition.Location = new System.Drawing.Point(77, 88);
-            this.txtInitialPosition.Name = "txtInitialPosition";
-            this.txtInitialPosition.Size = new System.Drawing.Size(85, 20);
-            this.txtInitialPosition.TabIndex = 8;
-            this.txtInitialPosition.TextChanged += new System.EventHandler(this.txtInitialPosition_TextChanged);
+            this.txtTcpPort.Location = new System.Drawing.Point(77, 88);
+            this.txtTcpPort.Name = "txtTcpPort";
+            this.txtTcpPort.Size = new System.Drawing.Size(85, 20);
+            this.txtTcpPort.TabIndex = 8;
             // 
             // label3
             // 
             this.label3.AutoSize = true;
             this.label3.Location = new System.Drawing.Point(3, 91);
             this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(71, 13);
+            this.label3.Size = new System.Drawing.Size(49, 13);
             this.label3.TabIndex = 9;
-            this.label3.Text = "Initial Position";
+            this.label3.Text = "TCP port";
             // 
             // lblInitPosInst
             // 
             this.lblInitPosInst.AutoSize = true;
             this.lblInitPosInst.Location = new System.Drawing.Point(166, 91);
             this.lblInitPosInst.Name = "lblInitPosInst";
-            this.lblInitPosInst.Size = new System.Drawing.Size(182, 13);
+            this.lblInitPosInst.Size = new System.Drawing.Size(139, 13);
             this.lblInitPosInst.TabIndex = 10;
-            this.lblInitPosInst.Text = "(Leave blank to keep stored position)";
+            this.lblInitPosInst.Text = "(Leave blank to use default)";
             // 
             // SetupDialogForm
             // 
@@ -148,10 +128,8 @@ namespace ASCOM.Arduino
             this.ClientSize = new System.Drawing.Size(364, 183);
             this.Controls.Add(this.lblInitPosInst);
             this.Controls.Add(this.label3);
-            this.Controls.Add(this.txtInitialPosition);
-            this.Controls.Add(this.comboBoxComPort);
+            this.Controls.Add(this.txtTcpPort);
             this.Controls.Add(this.chkTrace);
-            this.Controls.Add(this.label2);
             this.Controls.Add(this.picASCOM);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.cmdCancel);
@@ -175,10 +153,8 @@ namespace ASCOM.Arduino
         private System.Windows.Forms.Button cmdCancel;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.PictureBox picASCOM;
-        private System.Windows.Forms.Label label2;
         private System.Windows.Forms.CheckBox chkTrace;
-        private System.Windows.Forms.ComboBox comboBoxComPort;
-        private System.Windows.Forms.TextBox txtInitialPosition;
+        private System.Windows.Forms.TextBox txtTcpPort;
         private System.Windows.Forms.Label label3;
         private System.Windows.Forms.Label lblInitPosInst;
     }

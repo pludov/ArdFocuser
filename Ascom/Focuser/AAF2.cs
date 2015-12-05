@@ -611,16 +611,20 @@ namespace ASCOM.Arduino
         {
             // DMW connect to the device
             // get the port name from the profile
-/*            string portName;
+            string portName;
+            int tcpPort;
+
             using (ASCOM.Utilities.Profile p = new Profile())
             {
                 p.DeviceType = "Focuser";
-                portName = p.GetValue(driverID, "ComPort");
+                portName = p.GetValue(driverID, Focuser.tcpPortProfileName);
             }
             if (string.IsNullOrEmpty(portName))
             {
-                throw new ASCOM.NotConnectedException("No COM Port Selected");
-            }*/
+                tcpPort = 1051;
+            } else {
+                tcpPort = int.Parse(portName);
+            }
 
             // try to connect to port
             try
@@ -628,7 +632,7 @@ namespace ASCOM.Arduino
                 clientSocket.ReceiveTimeout = 10000;
                 clientSocket.SendTimeout = 10000;
                 // FIXME : le port
-                clientSocket.Connect("127.0.0.1", 1051);
+                clientSocket.Connect("127.0.0.1", tcpPort);
                 
                 // Moved to socket: serialPort = new Serial();
                 // Moved to socket: serialPort.PortName = portName;

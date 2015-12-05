@@ -82,14 +82,14 @@ namespace ASCOM.Arduino
         /// </summary>
         private static string driverDescription = "ASCOM Focuser Driver for Arduino Focuser";     // tekkydave
 
-        internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
-        internal static string comPortDefault = "COM1";
         internal static string traceStateProfileName = "Trace Level";
         internal static string traceStateDefault = "false";
 
-        internal static string comPort; // Variables to hold the currrent device configuration
+        internal static string tcpPortProfileName = "Tcp Port";
+        internal static string tcpPortDefault = "";
+
         internal static bool traceState;
-        internal static int newInitialPosition = 0; // tekkydave - to hold new initial position passed from setup dialog
+        internal static int tcpPort;
 
         #endregion
 
@@ -242,17 +242,13 @@ namespace ASCOM.Arduino
                     if (aaf2.isConnected())   // tekkydave - return if already connected
                         return;
 
-                    tl.LogMessage("Connected Set", "Connecting to port " + comPort);
+                    tl.LogMessage("Connected Set", "Connecting");
                     // TODO connect to the device
                     aaf2.connect(driverID);         // tekkydave - Connect to device
-
-                    // set new initial position to initial position from setup dialog
-                    if (newInitialPosition != 0)
-                        aaf2.setInitialPosition(newInitialPosition);
                 }
                 else
                 {
-                    tl.LogMessage("Connected Set", "Disconnecting from port " + comPort);
+                    tl.LogMessage("Connected Set", "Disconnecting");
                     // TODO disconnect from the device
                     aaf2.disconnect();      // tekkydave - Disconnect from device
                 }
@@ -551,7 +547,7 @@ namespace ASCOM.Arduino
             {
                 driverProfile.DeviceType = "Focuser";
                 traceState = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                comPort = driverProfile.GetValue(driverID, comPortProfileName, string.Empty, comPortDefault);
+                tcpPort = Convert.ToInt32(driverProfile.GetValue(driverID, tcpPortProfileName, string.Empty, tcpPortDefault));
             }
         }
 
@@ -564,7 +560,7 @@ namespace ASCOM.Arduino
             {
                 driverProfile.DeviceType = "Focuser";
                 driverProfile.WriteValue(driverID, traceStateProfileName, traceState.ToString());
-                driverProfile.WriteValue(driverID, comPortProfileName, comPort.ToString());
+                driverProfile.WriteValue(driverID, tcpPortProfileName, tcpPort.ToString());
             }
         }
 

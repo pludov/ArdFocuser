@@ -16,46 +16,25 @@ namespace ASCOM.Arduino
         public SetupDialogForm()
         {
             InitializeComponent();
-            // Initialise current values of user settings from the ASCOM Profile 
-            comboBoxComPort.Items.Clear();
-            using (ASCOM.Utilities.Serial serial = new Utilities.Serial())
-            {
-                int i = 0;
-                foreach (var item in serial.AvailableCOMPorts)
-                {
-                    comboBoxComPort.Items.Add(item);
-                    if (item == Focuser.comPort)
-                    {
-                        comboBoxComPort.SelectedIndex = i;
-                    }
-                    i++;
-                }
-            }
-
+            
+            txtTcpPort.Text = Focuser.tcpPort != -1 ? "" + Focuser.tcpPort : "";
             chkTrace.Checked = Focuser.traceState;
+            
         }
 
         private void cmdOK_Click(object sender, EventArgs e) // OK button event handler
         {
             // Place any validation constraint checks here
 
-            Focuser.comPort = comboBoxComPort.Text; // Update the state variables with results from the dialogue
+            Focuser.tcpPort = String.IsNullOrWhiteSpace(txtTcpPort.Text) ? -1 : Int32.Parse(txtTcpPort.Text);
             Focuser.traceState = chkTrace.Checked;
 
-            // If a new initial position entered pass it to focuser
-            if (!String.IsNullOrEmpty(txtInitialPosition.Text))
-            {
-                Focuser.newInitialPosition = Int32.Parse(txtInitialPosition.Text);
-            }
-            else
-            {
-                Focuser.newInitialPosition = 0;
-            }
 
             using (ASCOM.Utilities.Profile p = new Utilities.Profile())
             {
                 p.DeviceType = "Focuser";
-                p.WriteValue(Focuser.driverID, "ComPort", (string)comboBoxComPort.Text);
+                p.WriteValue(Focuser.driverID, Focuser.tcpPortProfileName, (string)txtTcpPort.Text);
+                p.WriteValue(Focuser.driverID, Focuser.traceStateProfileName, (string)txtTcpPort.Text);
             }
         }
 
@@ -79,16 +58,6 @@ namespace ASCOM.Arduino
             {
                 MessageBox.Show(other.Message);
             }
-        }
-
-        private void comboBox1_SelectedIndexChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void txtInitialPosition_TextChanged(object sender, EventArgs e)
-        {
-
         }
     }
 }
