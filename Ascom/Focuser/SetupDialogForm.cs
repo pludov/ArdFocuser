@@ -22,11 +22,16 @@ namespace ASCOM.Arduino
             
         }
 
+        public delegate void SaveParametersFunc(int port, bool trace);
+
+        public SaveParametersFunc saveParameters;
+
         private void cmdOK_Click(object sender, EventArgs e) // OK button event handler
         {
             // Place any validation constraint checks here
+            saveParameters.DynamicInvoke(String.IsNullOrWhiteSpace(txtTcpPort.Text) ? -1 : int.Parse(txtTcpPort.Text), chkTrace.Checked);
 
-            Focuser.tcpPort = String.IsNullOrWhiteSpace(txtTcpPort.Text) ? -1 : Int32.Parse(txtTcpPort.Text);
+/*            Focuser.tcpPort = String.IsNullOrWhiteSpace(txtTcpPort.Text) ? -1 : int.Parse(txtTcpPort.Text);
             Focuser.traceState = chkTrace.Checked;
 
 
@@ -35,7 +40,7 @@ namespace ASCOM.Arduino
                 p.DeviceType = "Focuser";
                 p.WriteValue(Focuser.driverID, Focuser.tcpPortProfileName, (string)txtTcpPort.Text);
                 p.WriteValue(Focuser.driverID, Focuser.traceStateProfileName, (string)txtTcpPort.Text);
-            }
+            }*/
         }
 
         private void cmdCancel_Click(object sender, EventArgs e) // Cancel button event handler

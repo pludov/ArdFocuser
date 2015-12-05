@@ -107,11 +107,6 @@ namespace ASCOM.Arduino
         private AstroUtils astroUtilities;
 
         /// <summary>
-        /// Private variable to hold the trace logger object (creates a diagnostic log file with information that you specify)
-        /// </summary>
-        private TraceLogger tl;
-
-        /// <summary>
         /// tekkydave - ArduinoFocuser object to hold all custom code relating to Arduino device
         /// </summary>
         private ArduinoFocuser focuser;  // tekkydave
@@ -126,17 +121,42 @@ namespace ASCOM.Arduino
         {
             ReadProfile(); // Read device configuration from the ASCOM Profile store
 
-            tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_Driver");      // tekkydave - Added path to trace file
-            tl.Enabled = traceState;
-            tl.LogMessage("Focuser", "Starting initialisation");
-
             utilities = new Util(); //Initialise util object
             astroUtilities = new AstroUtils(); // Initialise astro utilities object
             //TODO: Implement your additional construction here
-            focuser = new ArduinoFocuser(traceState);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
-            tl.LogMessage("Focuser", "Completed initialisation");
+            focuser = new ArduinoFocuser(this);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
         }
 
+        private TraceLogger tl = null;
+
+        public void logMessage(string id, string message)
+        {
+            if (traceState)
+            {
+                try
+                {
+                    if (tl == null)
+                    {
+                        tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_aaf2");      // Trace Logger
+                        tl.Enabled = true;
+                    }
+                    tl.LogMessage(id, message);
+                }
+                catch
+                {
+                }
+            }
+        }
+
+        ~Focuser() // Destructor
+        {
+            if (tl != null)
+            {
+                tl.Enabled = false;
+                tl.Dispose();
+            }
+            tl = null;
+        }
 
         //
         // PUBLIC COM INTERFACE IFocuserV2 IMPLEMENTATION
@@ -157,7 +177,11 @@ namespace ASCOM.Arduino
             if (IsConnected)
                 System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
 
-            using (SetupDialogForm F = new SetupDialogForm())
+            using (SetupDialogForm F = new SetupDialogForm()
+            {
+                // saveParameters = saveParametersImpl;//new Func<int,bool>();
+                saveParameters = saveParametersImpl
+            })
             {
                 var result = F.ShowDialog();
                 if (result == System.Windows.Forms.DialogResult.OK)
@@ -167,11 +191,24 @@ namespace ASCOM.Arduino
             }
         }
 
+        void saveParametersImpl(int port, bool traceState)
+        {
+           Focuser.tcpPort = port;
+           Focuser.traceState = traceState;
+
+           using (ASCOM.Utilities.Profile p = new Utilities.Profile())
+           {
+               p.DeviceType = "Focuser";
+               p.WriteValue(Focuser.driverID, Focuser.tcpPortProfileName, "" + port);
+               p.WriteValue(Focuser.driverID, Focuser.traceStateProfileName, "" + traceState);
+           }
+        }
+
         public ArrayList SupportedActions
         {
             get
             {
-                tl.LogMessage("SupportedActions Get", "Returning empty arraylist");
+                logMessage("SupportedActions Get", "Returning empty arraylist");
                 return new ArrayList();
             }
         }
@@ -228,12 +265,12 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("Connected Get", IsConnected.ToString());
+                logMessage("Connected Get", IsConnected.ToString());
                 return IsConnected;
             }
             set
             {
-                tl.LogMessage("Connected Set", value.ToString());
+                logMessage("Connected Set", value.ToString());
                 if (value == IsConnected)
                     return;
 
@@ -242,13 +279,13 @@ namespace ASCOM.Arduino
                     if (focuser.isConnected())   // tekkydave - return if already connected
                         return;
 
-                    tl.LogMessage("Connected Set", "Connecting");
+                    logMessage("Connected Set", "Connecting");
                     // TODO connect to the device
                     focuser.connect(driverID);         // tekkydave - Connect to device
                 }
                 else
                 {
-                    tl.LogMessage("Connected Set", "Disconnecting");
+                    logMessage("Connected Set", "Disconnecting");
                     // TODO disconnect from the device
                     focuser.disconnect();      // tekkydave - Disconnect from device
                 }
@@ -260,7 +297,7 @@ namespace ASCOM.Arduino
             // TODO customise this device description
             get
             {
-                tl.LogMessage("Description Get", driverDescription);
+                logMessage("Description Get", driverDescription);
                 return driverDescription;
             }
         }
@@ -273,7 +310,7 @@ namespace ASCOM.Arduino
                 // TODO customise this driver description
                 //string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
                 string driverInfo = focuser.DriverInfo + " Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);   // tekkydave - replaced above line with my definition
-                tl.LogMessage("DriverInfo Get", driverInfo);
+                logMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
         }
@@ -284,7 +321,7 @@ namespace ASCOM.Arduino
             {
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
-                tl.LogMessage("DriverVersion Get", driverVersion);
+                logMessage("DriverVersion Get", driverVersion);
                 return driverVersion;
             }
         }
@@ -294,7 +331,7 @@ namespace ASCOM.Arduino
             // set by the driver wizard
             get
             {
-                tl.LogMessage("InterfaceVersion Get", "2");
+                logMessage("InterfaceVersion Get", "2");
                 return Convert.ToInt16("2");
             }
         }
@@ -305,7 +342,7 @@ namespace ASCOM.Arduino
             {
                 //string name = "Short driver name - please customise";
                 string name = focuser.Name;    // tekkydave - replaced line above with call to AAF2
-                tl.LogMessage("Name Get", name);
+                logMessage("Name Get", name);
                 return name;
             }
         }
@@ -318,14 +355,14 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("Absolute Get", true.ToString());
+                logMessage("Absolute Get", true.ToString());
                 return true; // This is an absolute focuser
             }
         }
 
         public void Halt()
         {
-            tl.LogMessage("Halt", "Stopping Focuser movement.");
+            logMessage("Halt", "Stopping Focuser movement.");
             focuser.halt();
         }
 
@@ -333,7 +370,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("IsMoving Get", false.ToString());
+                logMessage("IsMoving Get", false.ToString());
                 // return false; // This focuser always moves instantaneously so no need for IsMoving ever to be True
                 return focuser.isMoving();     // tekkydave - call AAF2.ismoving
             }
@@ -343,12 +380,12 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("Link Get", this.Connected.ToString());
+                logMessage("Link Get", this.Connected.ToString());
                 return this.Connected; // Direct function to the connected method, the Link method is just here for backwards compatibility
             }
             set
             {
-                tl.LogMessage("Link Set", value.ToString());
+                logMessage("Link Set", value.ToString());
                 this.Connected = value; // Direct function to the connected method, the Link method is just here for backwards compatibility
             }
         }
@@ -358,7 +395,7 @@ namespace ASCOM.Arduino
             get
             {
                 int focuserSteps = focuser.getMaxStep();
-                tl.LogMessage("MaxIncrement Get", focuserSteps.ToString());
+                logMessage("MaxIncrement Get", focuserSteps.ToString());
                 return focuserSteps; // Maximum change in one move
             }
         }
@@ -368,14 +405,14 @@ namespace ASCOM.Arduino
             get
             {
                 int focuserSteps = focuser.getMaxStep();
-                tl.LogMessage("MaxStep Get", focuserSteps.ToString());
+                logMessage("MaxStep Get", focuserSteps.ToString());
                 return focuserSteps; // Maximum extent of the focuser, so position range is 0 to 10,000
             }
         }
 
         public void Move(int Position)
         {
-            tl.LogMessage("Move", Position.ToString());
+            logMessage("Move", Position.ToString());
 
             // Stop focuserPosition being set to negative values
             if (Position < 0)
@@ -396,7 +433,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                //tl.LogMessage("StepSize Get", "Not implemented");                      // tekkydave - replaced with call to AAF2.Stepsize
+                //logMessage("StepSize Get", "Not implemented");                      // tekkydave - replaced with call to AAF2.Stepsize
                 //throw new ASCOM.PropertyNotImplementedException("StepSize", false);    // tekkydave - replaced with call to AAF2.Stepsize
                 return 1.0;
             }
@@ -406,12 +443,12 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("TempComp Get", false.ToString());
+                logMessage("TempComp Get", false.ToString());
                 return false;
             }
             set
             {
-                tl.LogMessage("TempComp Set", "Not implemented");
+                logMessage("TempComp Set", "Not implemented");
                 throw new ASCOM.PropertyNotImplementedException("TempComp", false);
             }
         }
@@ -420,7 +457,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                tl.LogMessage("TempCompAvailable Get", false.ToString());
+                logMessage("TempCompAvailable Get", false.ToString());
                 return false; // Temperature compensation is not available in this driver
             }
         }
@@ -429,7 +466,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                //tl.LogMessage("Temperature Get", "Not implemented");                      // tekkydave - replaced with call to AAF2.getTemperature
+                //logMessage("Temperature Get", "Not implemented");                      // tekkydave - replaced with call to AAF2.getTemperature
                 //throw new ASCOM.PropertyNotImplementedException("Temperature", false);    // tekkydave - replaced with call to AAF2.getTemperature
                 return focuser.getTemperature();
             }
@@ -547,7 +584,14 @@ namespace ASCOM.Arduino
             {
                 driverProfile.DeviceType = "Focuser";
                 traceState = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                tcpPort = Convert.ToInt32(driverProfile.GetValue(driverID, tcpPortProfileName, string.Empty, tcpPortDefault));
+                tcpPort = -1;
+                try
+                {
+                    tcpPort = int.Parse(driverProfile.GetValue(driverID, tcpPortProfileName, string.Empty, tcpPortDefault));
+                }
+                catch
+                {
+                }
             }
         }
 

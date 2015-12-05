@@ -549,20 +549,20 @@ namespace ASCOM.Arduino
         private static double stepsize = 1;                                 // No of steps to move focusser motor for each value in Move() call
         private static string driverInfo = "Ascom-Arduino Focuser V2.";     // Driver Info String
         private static string name = "Arduino.Focuser";                                // Driver Short Name
-        private TraceLogger tl;
+        private Focuser driver;
 
-        public ArduinoFocuser(bool traceState)
+        public ArduinoFocuser(Focuser driver)
         {
-            tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_aaf2");      // Trace Logger
-            tl.Enabled = traceState;
-            tl.LogMessage("AAF2", "Constructed");
+            this.driver = driver;
+        }
+
+        void logMessage(string id, string message)
+        {
+            this.driver.logMessage(id, message);
         }
 
         ~ArduinoFocuser() // Destructor
         {
-            tl.Enabled = false;
-            tl.Dispose();
-            tl = null;
         }
 
         public string internalCommandString(string command, bool raw)
@@ -570,17 +570,17 @@ namespace ASCOM.Arduino
             if (!clientSocket.Connected) {
                 throw new ASCOM.NotConnectedException();
             }
-            tl.LogMessage("AAF2.CommandString", "------------------ Start -----------------------");
-            tl.LogMessage("AAF2.CommandString", "Command = " + command);
+            logMessage("AAF2.CommandString", "------------------ Start -----------------------");
+            logMessage("AAF2.CommandString", "Command = " + command);
             string s = null;
-            tl.LogMessage("AAF2.CommandString", "Transmitting:" + command);
+            logMessage("AAF2.CommandString", "Transmitting:" + command);
             NetworkStream serverStream = clientSocket.GetStream();
             byte[] outStream = System.Text.Encoding.GetEncoding(28591).GetBytes(command);
             serverStream.Write(outStream, 0, outStream.Length);
             serverStream.Flush();
             // Moved to socket: serialPort.Transmit(command);
             // Moved to socket: System.Threading.Thread.Sleep(250);
-            tl.LogMessage("AAF2.CommandString", "Getting Return Message");
+            logMessage("AAF2.CommandString", "Getting Return Message");
 
             // Moved to socket:  string result = serialPort.ReceiveTerminated("#");
             int b;
@@ -597,34 +597,20 @@ namespace ASCOM.Arduino
                 }
                 result += (char)b;
             } while(true);
-            tl.LogMessage("AAF2.CommandString", "Return Message = " + result);
+            logMessage("AAF2.CommandString", "Return Message = " + result);
 
             if (result.StartsWith("ERR")) {
                 throw new ASCOM.DriverException("Order failed");
             }
 
-            tl.LogMessage("AAF2.CommandString", "------------------ Finish ----------------------");
+            logMessage("AAF2.CommandString", "------------------ Finish ----------------------");
             return result;
         }
 
         public void connect(string driverID)
         {
             // DMW connect to the device
-            // get the port name from the profile
-            string portName;
-            int tcpPort;
-
-            using (ASCOM.Utilities.Profile p = new Profile())
-            {
-                p.DeviceType = "Focuser";
-                portName = p.GetValue(driverID, Focuser.tcpPortProfileName);
-            }
-            if (string.IsNullOrEmpty(portName))
-            {
-                tcpPort = 1051;
-            } else {
-                tcpPort = int.Parse(portName);
-            }
+            int tcpPort = Focuser.tcpPort;
 
             // try to connect to port
             try
@@ -643,7 +629,7 @@ namespace ASCOM.Arduino
             }
             catch (Exception ex)
             {
-                throw new ASCOM.NotConnectedException("Serial Port Connection error", ex);
+                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + tcpPort + " - is ArduinoFocuserUI connected ?", ex);
             }
 
             // Moved to socket: System.Threading.Thread.Sleep(2000);    // Wait 2s for connection to settle
@@ -669,52 +655,52 @@ namespace ASCOM.Arduino
         public void setInitialPosition(int Position)
         {
             string command = "I" + Position.ToString() + "#";
-            tl.LogMessage("AAF2.setInitialPosition", "Sending: " + command);
+            logMessage("AAF2.setInitialPosition", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.setInitialPosition", "Received: " + r);
+            logMessage("AAF2.setInitialPosition", "Received: " + r);
         }
 
         public void setTargetPosition(int Position)
         {
             string command = "T" + Position.ToString() + "#";
-            tl.LogMessage("AAF2.setPosition", "Sending: " + command);
+            logMessage("AAF2.setPosition", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.setPosition", "Received: " + r);
+            logMessage("AAF2.setPosition", "Received: " + r);
         }
 
         public int getPosition()
         {
             string command = "P" + "#";
-            tl.LogMessage("AAF2.getPosition", "Sending: " + command);
+            logMessage("AAF2.getPosition", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.getPosition", "Received: " + r);
+            logMessage("AAF2.getPosition", "Received: " + r);
             string[] w = r.Split(':');
             string p = w[0].Substring(1);
-            tl.LogMessage("AAF2.getPosition", "Position = " + p);
+            logMessage("AAF2.getPosition", "Position = " + p);
             return Int32.Parse(p);
         }
 
         public int getMaxStep()
         {
             string command = "R" + "#";
-            tl.LogMessage("AAF2.getMaxStep", "Sending: " + command);
+            logMessage("AAF2.getMaxStep", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.getMaxStep", "Received: " + r);
+            logMessage("AAF2.getMaxStep", "Received: " + r);
             string[] w = r.Split(':');
             string p = w[0].Substring(1);
-            tl.LogMessage("AAF2.getMaxStep", "Position = " + p);
+            logMessage("AAF2.getMaxStep", "Position = " + p);
             return Int32.Parse(p);
         }
 
         public double getTemperature()
         {
             string command = "C" + "#";
-            tl.LogMessage("AAF2.getTemperature", "Sending: " + command);
+            logMessage("AAF2.getTemperature", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.getTemperature", "Received: " + r);
+            logMessage("AAF2.getTemperature", "Received: " + r);
             string[] w = r.Split(':');
             string p = w[0].Substring(1);
-            tl.LogMessage("AAF2.getTemperature", "Temperature = " + p);
+            logMessage("AAF2.getTemperature", "Temperature = " + p);
             return Double.Parse(p)/100D;
         }
 
@@ -722,26 +708,26 @@ namespace ASCOM.Arduino
         {
             bool result;
             string command = "M#";
-            tl.LogMessage("AAF2.isMoving", "Sending: " + command);
+            logMessage("AAF2.isMoving", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.isMoving", "Received: " + r);
+            logMessage("AAF2.isMoving", "Received: " + r);
             
             string[] w = r.Split(':');
             string p = w[0].Substring(1);
             
             if (p == "1")
             {
-                tl.LogMessage("AAF2.isMoving", "Focuser is Moving");
+                logMessage("AAF2.isMoving", "Focuser is Moving");
                 result = true;
             }
             else if (p == "0")
             {
-                tl.LogMessage("AAF2.isMoving", "Focuser is Not Moving");
+                logMessage("AAF2.isMoving", "Focuser is Not Moving");
                 result = false;
             }
             else
             {
-                tl.LogMessage("AAF2.isMoving", "Unable to say");
+                logMessage("AAF2.isMoving", "Unable to say");
                 result = false;
             }
 
@@ -771,9 +757,9 @@ namespace ASCOM.Arduino
         public void halt()
         {
             string command = "H#";
-            tl.LogMessage("AAF2.halt", "Sending: " + command);
+            logMessage("AAF2.halt", "Sending: " + command);
             string r = internalCommandString(command, true);
-            tl.LogMessage("AAF2.halt", "Received: " + r);
+            logMessage("AAF2.halt", "Received: " + r);
         }
     }
 }
