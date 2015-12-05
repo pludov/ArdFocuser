@@ -78,6 +78,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BaseDriver.cs" />
+    <Compile Include="FilterWheelDriver.cs" />
     <Compile Include="Focuser.cs" />
     <Compile Include="FocuserDriver.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
