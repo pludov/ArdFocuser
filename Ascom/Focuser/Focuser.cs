@@ -29,7 +29,7 @@ namespace ASCOM.Arduino
             set {
                 if (value != this.isConnected()) {
                     if (value) {
-                        this.connect("");
+                        this.connect();
                     } else {
                         this.disconnect();
                     }
@@ -545,13 +545,13 @@ namespace ASCOM.Arduino
 
         // Move to socket 
         // private static Serial serialPort;                                   // Serial Port
-        private static System.Net.Sockets.TcpClient clientSocket = new System.Net.Sockets.TcpClient();
+        private System.Net.Sockets.TcpClient clientSocket = new System.Net.Sockets.TcpClient();
         private static double stepsize = 1;                                 // No of steps to move focusser motor for each value in Move() call
         private static string driverInfo = "Ascom-Arduino Focuser V2.";     // Driver Info String
         private static string name = "Arduino.Focuser";                                // Driver Short Name
-        private Focuser driver;
+        private BaseDriver driver;
 
-        public ArduinoFocuser(Focuser driver)
+        public ArduinoFocuser(BaseDriver driver)
         {
             this.driver = driver;
         }
@@ -572,7 +572,6 @@ namespace ASCOM.Arduino
             }
             logMessage("AAF2.CommandString", "------------------ Start -----------------------");
             logMessage("AAF2.CommandString", "Command = " + command);
-            string s = null;
             logMessage("AAF2.CommandString", "Transmitting:" + command);
             NetworkStream serverStream = clientSocket.GetStream();
             byte[] outStream = System.Text.Encoding.GetEncoding(28591).GetBytes(command);
@@ -607,18 +606,15 @@ namespace ASCOM.Arduino
             return result;
         }
 
-        public void connect(string driverID)
+        public void connect()
         {
-            // DMW connect to the device
-            int tcpPort = Focuser.tcpPort;
-
             // try to connect to port
             try
             {
                 clientSocket.ReceiveTimeout = 10000;
                 clientSocket.SendTimeout = 10000;
                 // FIXME : le port
-                clientSocket.Connect("127.0.0.1", tcpPort);
+                clientSocket.Connect("127.0.0.1", driver.tcpPort);
                 
                 // Moved to socket: serialPort = new Serial();
                 // Moved to socket: serialPort.PortName = portName;
@@ -629,7 +625,7 @@ namespace ASCOM.Arduino
             }
             catch (Exception ex)
             {
-                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + tcpPort + " - is ArduinoFocuserUI connected ?", ex);
+                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + driver.tcpPort + " - is ArduinoFocuserUI connected ?", ex);
             }
 
             // Moved to socket: System.Threading.Thread.Sleep(2000);    // Wait 2s for connection to settle

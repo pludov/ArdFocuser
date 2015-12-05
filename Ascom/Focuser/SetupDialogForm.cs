@@ -13,12 +13,12 @@ namespace ASCOM.Arduino
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form
     {
-        public SetupDialogForm()
+        public SetupDialogForm(BaseDriver driver)
         {
             InitializeComponent();
-            
-            txtTcpPort.Text = Focuser.tcpPort != -1 ? "" + Focuser.tcpPort : "";
-            chkTrace.Checked = Focuser.traceState;
+
+            txtTcpPort.Text = driver.tcpPort != -1 ? "" + driver.tcpPort : "";
+            chkTrace.Checked = driver.traceState;
             
         }
 

@@ -69,47 +69,19 @@ namespace ASCOM.Arduino
     /// </summary>
     [Guid("9117b7a1-d864-4081-952a-0a2ae7249789")]
     [ClassInterface(ClassInterfaceType.None)]
-    public class Focuser : IFocuserV2
+    public class Focuser : BaseDriver, IFocuserV2
     {
         #region Constants
         /// <summary>
         /// ASCOM DeviceID (COM ProgID) for this driver.
         /// The DeviceID is used by ASCOM applications to load the driver at runtime.
         /// </summary>
-        internal static string driverID = "ASCOM.Arduino.Focuser";     // tekkydave
+        internal static string focuserDriverID = "ASCOM.Arduino.Focuser";     // tekkydave
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM Focuser Driver for Arduino Focuser";     // tekkydave
+        private static string focuserDriverDescription = "ASCOM Focuser Driver for Arduino Focuser";     // tekkydave
 
-        internal static string traceStateProfileName = "Trace Level";
-        internal static string traceStateDefault = "false";
-
-        internal static string tcpPortProfileName = "Tcp Port";
-        internal static string tcpPortDefault = "";
-
-        internal static bool traceState;
-        internal static int tcpPort;
-
-        #endregion
-
-        #region Variables
-
-
-        /// <summary>
-        /// Private variable to hold an ASCOM Utilities object
-        /// </summary>
-        private Util utilities;
-
-        /// <summary>
-        /// Private variable to hold an ASCOM AstroUtilities object to provide the Range method
-        /// </summary>
-        private AstroUtils astroUtilities;
-
-        /// <summary>
-        /// tekkydave - ArduinoFocuser object to hold all custom code relating to Arduino device
-        /// </summary>
-        private ArduinoFocuser focuser;  // tekkydave
 
         #endregion
 
@@ -117,237 +89,14 @@ namespace ASCOM.Arduino
         /// Initializes a new instance of the <see cref="ArduinoFocuser"/> class.
         /// Must be public for COM registration.
         /// </summary>
-        public Focuser()
+        public Focuser() : base("Focuser", focuserDriverID, focuserDriverDescription, 2)
         {
-            ReadProfile(); // Read device configuration from the ASCOM Profile store
-
-            utilities = new Util(); //Initialise util object
-            astroUtilities = new AstroUtils(); // Initialise astro utilities object
-            //TODO: Implement your additional construction here
-            focuser = new ArduinoFocuser(this);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
-        }
-
-        private TraceLogger tl = null;
-
-        public void logMessage(string id, string message)
-        {
-            if (traceState)
-            {
-                try
-                {
-                    if (tl == null)
-                    {
-                        tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_aaf2");      // Trace Logger
-                        tl.Enabled = true;
-                    }
-                    tl.LogMessage(id, message);
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        ~Focuser() // Destructor
-        {
-            if (tl != null)
-            {
-                tl.Enabled = false;
-                tl.Dispose();
-            }
-            tl = null;
+            
         }
 
         //
         // PUBLIC COM INTERFACE IFocuserV2 IMPLEMENTATION
         //
-
-        #region Common properties and methods.
-
-        /// <summary>
-        /// Displays the Setup Dialog form.
-        /// If the user clicks the OK button to dismiss the form, then
-        /// the new settings are saved, otherwise the old values are reloaded.
-        /// THIS IS THE ONLY PLACE WHERE SHOWING USER INTERFACE IS ALLOWED!
-        /// </summary>
-        public void SetupDialog()
-        {
-            // consider only showing the setup dialog if not connected
-            // or call a different dialog if connected
-            if (IsConnected)
-                System.Windows.Forms.MessageBox.Show("Already connected, just press OK");
-
-            using (SetupDialogForm F = new SetupDialogForm()
-            {
-                // saveParameters = saveParametersImpl;//new Func<int,bool>();
-                saveParameters = saveParametersImpl
-            })
-            {
-                var result = F.ShowDialog();
-                if (result == System.Windows.Forms.DialogResult.OK)
-                {
-                    WriteProfile(); // Persist device configuration values to the ASCOM Profile store
-                }
-            }
-        }
-
-        void saveParametersImpl(int port, bool traceState)
-        {
-           Focuser.tcpPort = port;
-           Focuser.traceState = traceState;
-
-           using (ASCOM.Utilities.Profile p = new Utilities.Profile())
-           {
-               p.DeviceType = "Focuser";
-               p.WriteValue(Focuser.driverID, Focuser.tcpPortProfileName, "" + port);
-               p.WriteValue(Focuser.driverID, Focuser.traceStateProfileName, "" + traceState);
-           }
-        }
-
-        public ArrayList SupportedActions
-        {
-            get
-            {
-                logMessage("SupportedActions Get", "Returning empty arraylist");
-                return new ArrayList();
-            }
-        }
-
-
-        public string Action(string actionName, string actionParameters)
-        {
-            throw new ASCOM.ActionNotImplementedException("Action " + actionName + " is not implemented by this driver");
-        }
-
-        public void CommandBlind(string command, bool raw)
-        {
-            CheckConnected("CommandBlind");
-            // Call CommandString and return as soon as it finishes
-            this.CommandString(command, raw);
-            // or
-            throw new ASCOM.MethodNotImplementedException("CommandBlind");
-        }
-
-        public bool CommandBool(string command, bool raw)
-        {
-            CheckConnected("CommandBool");
-            string ret = CommandString(command, raw);
-            // TODO decode the return string and return true or false
-            // or
-            throw new ASCOM.MethodNotImplementedException("CommandBool");
-        }
-
-        public string CommandString(string command, bool raw)
-        {
-            CheckConnected("CommandString");
-            // it's a good idea to put all the low level communication with the device here,
-            // then all communication calls this function
-            // you need something to ensure that only one command is in progress at a time
-
-            // throw new ASCOM.MethodNotImplementedException("CommandString");  // tekkydave - Deleted
-
-            return focuser.CommandString(command, raw);    // tekkydave - Call AAF2.CommandString
-        }
-
-        public void Dispose()
-        {
-            // Clean up the tracelogger and util objects
-            tl.Enabled = false;
-            tl.Dispose();
-            tl = null;
-            utilities.Dispose();
-            utilities = null;
-            astroUtilities.Dispose();
-            astroUtilities = null;
-        }
-
-        public bool Connected
-        {
-            get
-            {
-                logMessage("Connected Get", IsConnected.ToString());
-                return IsConnected;
-            }
-            set
-            {
-                logMessage("Connected Set", value.ToString());
-                if (value == IsConnected)
-                    return;
-
-                if (value)
-                {
-                    if (focuser.isConnected())   // tekkydave - return if already connected
-                        return;
-
-                    logMessage("Connected Set", "Connecting");
-                    // TODO connect to the device
-                    focuser.connect(driverID);         // tekkydave - Connect to device
-                }
-                else
-                {
-                    logMessage("Connected Set", "Disconnecting");
-                    // TODO disconnect from the device
-                    focuser.disconnect();      // tekkydave - Disconnect from device
-                }
-            }
-        }
-
-        public string Description
-        {
-            // TODO customise this device description
-            get
-            {
-                logMessage("Description Get", driverDescription);
-                return driverDescription;
-            }
-        }
-
-        public string DriverInfo
-        {
-            get
-            {
-                Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                // TODO customise this driver description
-                //string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
-                string driverInfo = focuser.DriverInfo + " Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);   // tekkydave - replaced above line with my definition
-                logMessage("DriverInfo Get", driverInfo);
-                return driverInfo;
-            }
-        }
-
-        public string DriverVersion
-        {
-            get
-            {
-                Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
-                string driverVersion = String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
-                logMessage("DriverVersion Get", driverVersion);
-                return driverVersion;
-            }
-        }
-
-        public short InterfaceVersion
-        {
-            // set by the driver wizard
-            get
-            {
-                logMessage("InterfaceVersion Get", "2");
-                return Convert.ToInt16("2");
-            }
-        }
-
-        public string Name
-        {
-            get
-            {
-                //string name = "Short driver name - please customise";
-                string name = focuser.Name;    // tekkydave - replaced line above with call to AAF2
-                logMessage("Name Get", name);
-                return name;
-            }
-        }
-
-        #endregion
 
         #region IFocuser Implementation
 
@@ -495,11 +244,11 @@ namespace ASCOM.Arduino
                 P.DeviceType = "Focuser";
                 if (bRegister)
                 {
-                    P.Register(driverID, driverDescription);
+                    P.Register(focuserDriverID, focuserDriverDescription);
                 }
                 else
                 {
-                    P.Unregister(driverID);
+                    P.Unregister(focuserDriverID);
                 }
             }
         }
@@ -552,63 +301,7 @@ namespace ASCOM.Arduino
 
         #endregion
 
-        /// <summary>
-        /// Returns true if there is a valid connection to the driver hardware
-        /// </summary>
-        private bool IsConnected
-        {
-            get
-            {
-                return focuser.isConnected();
-            }
-        }
-
-        /// <summary>
-        /// Use this function to throw an exception if we aren't connected to the hardware
-        /// </summary>
-        /// <param name="message"></param>
-        private void CheckConnected(string message)
-        {
-            if (!IsConnected)
-            {
-                throw new ASCOM.NotConnectedException(message);
-            }
-        }
-
-        /// <summary>
-        /// Read the device configuration from the ASCOM Profile store
-        /// </summary>
-        internal void ReadProfile()
-        {
-            using (Profile driverProfile = new Profile())
-            {
-                driverProfile.DeviceType = "Focuser";
-                traceState = Convert.ToBoolean(driverProfile.GetValue(driverID, traceStateProfileName, string.Empty, traceStateDefault));
-                tcpPort = -1;
-                try
-                {
-                    tcpPort = int.Parse(driverProfile.GetValue(driverID, tcpPortProfileName, string.Empty, tcpPortDefault));
-                }
-                catch
-                {
-                }
-            }
-        }
-
-        /// <summary>
-        /// Write the device configuration to the  ASCOM  Profile store
-        /// </summary>
-        internal void WriteProfile()
-        {
-            using (Profile driverProfile = new Profile())
-            {
-                driverProfile.DeviceType = "Focuser";
-                driverProfile.WriteValue(driverID, traceStateProfileName, traceState.ToString());
-                driverProfile.WriteValue(driverID, tcpPortProfileName, tcpPort.ToString());
-            }
-        }
 
         #endregion
-
     }
 }
