@@ -114,7 +114,7 @@ namespace ASCOM.Arduino
         /// <summary>
         /// tekkydave - ArduinoFocuser object to hold all custom code relating to Arduino device
         /// </summary>
-        private ArduinoFocuser aaf2;  // tekkydave
+        private ArduinoFocuser focuser;  // tekkydave
 
         #endregion
 
@@ -133,7 +133,7 @@ namespace ASCOM.Arduino
             utilities = new Util(); //Initialise util object
             astroUtilities = new AstroUtils(); // Initialise astro utilities object
             //TODO: Implement your additional construction here
-            aaf2 = new ArduinoFocuser(traceState);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
+            focuser = new ArduinoFocuser(traceState);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
             tl.LogMessage("Focuser", "Completed initialisation");
         }
 
@@ -209,7 +209,7 @@ namespace ASCOM.Arduino
 
             // throw new ASCOM.MethodNotImplementedException("CommandString");  // tekkydave - Deleted
 
-            return aaf2.CommandString(command, raw);    // tekkydave - Call AAF2.CommandString
+            return focuser.CommandString(command, raw);    // tekkydave - Call AAF2.CommandString
         }
 
         public void Dispose()
@@ -239,18 +239,18 @@ namespace ASCOM.Arduino
 
                 if (value)
                 {
-                    if (aaf2.isConnected())   // tekkydave - return if already connected
+                    if (focuser.isConnected())   // tekkydave - return if already connected
                         return;
 
                     tl.LogMessage("Connected Set", "Connecting");
                     // TODO connect to the device
-                    aaf2.connect(driverID);         // tekkydave - Connect to device
+                    focuser.connect(driverID);         // tekkydave - Connect to device
                 }
                 else
                 {
                     tl.LogMessage("Connected Set", "Disconnecting");
                     // TODO disconnect from the device
-                    aaf2.disconnect();      // tekkydave - Disconnect from device
+                    focuser.disconnect();      // tekkydave - Disconnect from device
                 }
             }
         }
@@ -272,7 +272,7 @@ namespace ASCOM.Arduino
                 Version version = System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
                 // TODO customise this driver description
                 //string driverInfo = "Information about the driver itself. Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);
-                string driverInfo = aaf2.DriverInfo + " Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);   // tekkydave - replaced above line with my definition
+                string driverInfo = focuser.DriverInfo + " Version: " + String.Format(CultureInfo.InvariantCulture, "{0}.{1}", version.Major, version.Minor);   // tekkydave - replaced above line with my definition
                 tl.LogMessage("DriverInfo Get", driverInfo);
                 return driverInfo;
             }
@@ -304,7 +304,7 @@ namespace ASCOM.Arduino
             get
             {
                 //string name = "Short driver name - please customise";
-                string name = aaf2.Name;    // tekkydave - replaced line above with call to AAF2
+                string name = focuser.Name;    // tekkydave - replaced line above with call to AAF2
                 tl.LogMessage("Name Get", name);
                 return name;
             }
@@ -326,7 +326,7 @@ namespace ASCOM.Arduino
         public void Halt()
         {
             tl.LogMessage("Halt", "Stopping Focuser movement.");
-            aaf2.halt();
+            focuser.halt();
         }
 
         public bool IsMoving
@@ -335,7 +335,7 @@ namespace ASCOM.Arduino
             {
                 tl.LogMessage("IsMoving Get", false.ToString());
                 // return false; // This focuser always moves instantaneously so no need for IsMoving ever to be True
-                return aaf2.isMoving();     // tekkydave - call AAF2.ismoving
+                return focuser.isMoving();     // tekkydave - call AAF2.ismoving
             }
         }
 
@@ -357,7 +357,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                int focuserSteps = aaf2.getMaxStep();
+                int focuserSteps = focuser.getMaxStep();
                 tl.LogMessage("MaxIncrement Get", focuserSteps.ToString());
                 return focuserSteps; // Maximum change in one move
             }
@@ -367,7 +367,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                int focuserSteps = aaf2.getMaxStep();
+                int focuserSteps = focuser.getMaxStep();
                 tl.LogMessage("MaxStep Get", focuserSteps.ToString());
                 return focuserSteps; // Maximum extent of the focuser, so position range is 0 to 10,000
             }
@@ -381,14 +381,14 @@ namespace ASCOM.Arduino
             if (Position < 0)
                 Position = 0;
 
-            aaf2.setTargetPosition(Position);     // tekkydave - call AAF2.setPosition to set target position
+            focuser.setTargetPosition(Position);     // tekkydave - call AAF2.setPosition to set target position
         }
 
         public int Position
         {
             get
             {
-                return aaf2.getPosition(); // Return the focuser position
+                return focuser.getPosition(); // Return the focuser position
             }
         }
 
@@ -431,7 +431,7 @@ namespace ASCOM.Arduino
             {
                 //tl.LogMessage("Temperature Get", "Not implemented");                      // tekkydave - replaced with call to AAF2.getTemperature
                 //throw new ASCOM.PropertyNotImplementedException("Temperature", false);    // tekkydave - replaced with call to AAF2.getTemperature
-                return aaf2.getTemperature();
+                return focuser.getTemperature();
             }
         }
 
@@ -522,7 +522,7 @@ namespace ASCOM.Arduino
         {
             get
             {
-                return aaf2.isConnected();
+                return focuser.isConnected();
             }
         }
 
