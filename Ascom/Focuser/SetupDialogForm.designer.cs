@@ -1,4 +1,4 @@
-namespace ASCOM.AAF2
+namespace ASCOM.Arduino
 {
     partial class SetupDialogForm
     {
@@ -77,7 +77,7 @@ namespace ASCOM.AAF2
             // 
             this.picASCOM.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.picASCOM.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.picASCOM.Image = global::ASCOM.AAF2.Properties.Resources.ASCOM;
+            this.picASCOM.Image = global::ASCOM.Arduino.Properties.Resources.ASCOM;
             this.picASCOM.Location = new System.Drawing.Point(306, 9);
             this.picASCOM.Name = "picASCOM";
             this.picASCOM.Size = new System.Drawing.Size(48, 56);
@@ -162,7 +162,7 @@ namespace ASCOM.AAF2
             this.Name = "SetupDialogForm";
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Hide;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "AAF2 Setup";
+            this.Text = "Arduino Focuser Setup";
             ((System.ComponentModel.ISupportInitialize)(this.picASCOM)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

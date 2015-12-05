@@ -1,4 +1,4 @@
-﻿namespace ASCOM.AAF2.Properties {
+﻿namespace ASCOM.Arduino.Properties {
     
     
     // This class allows you to handle specific events on the settings class:

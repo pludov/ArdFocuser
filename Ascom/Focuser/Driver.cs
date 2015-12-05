@@ -1,6 +1,6 @@
 //tabs=4
 // --------------------------------------------------------------------------------
-// ASCOM Focuser driver for AAF2
+// ASCOM Focuser driver for Arduino Focuser
 //
 // Description:	This driver was written to support the Arduino-Ascom Focuser.
 //              The protocol used to communicate with the device is a custom protocol
@@ -8,7 +8,7 @@
 //              Arduino Nano and a stepper motor plus driver board.
 //              The Driver is built on the ASCOM focuser driver template.
 //              All code that communicates with the Arduino is contained in a separate
-//              class called AAF2. The minimum changes to Driver.cs have been made to aid future
+//              class called ArduinoFocuser. The minimum changes to Driver.cs have been made to aid future
 //              upgrades/rewrites and make it easier to see what's going on :-)
 //              All template code that has been modified is marked with a "// tekkydave" comment.
 //
@@ -54,20 +54,20 @@ using ASCOM.DeviceInterface;
 using System.Globalization;
 using System.Collections;
 
-namespace ASCOM.AAF2
+namespace ASCOM.Arduino
 {
     //
-    // Your driver's DeviceID is ASCOM.AAF2.Focuser
+    // Your driver's DeviceID is ASCOM.Arduino.Focuser
     //
-    // The Guid attribute sets the CLSID for ASCOM.AAF2.Focuser
+    // The Guid attribute sets the CLSID for ASCOM.Arduino.Focuser
     // The ClassInterface/None addribute prevents an empty interface called
-    // _AAF2 from being created and used as the [default] interface
+    // _Arduino from being created and used as the [default] interface
     //
     
     /// <summary>
-    /// ASCOM Focuser Driver for AAF2.
+    /// ASCOM Focuser Driver for ArduinoFocuser.
     /// </summary>
-    [Guid("9117b7a1-d864-4081-952a-0a2ae7109789")]
+    [Guid("9117b7a1-d864-4081-952a-0a2ae7249789")]
     [ClassInterface(ClassInterfaceType.None)]
     public class Focuser : IFocuserV2
     {
@@ -76,11 +76,11 @@ namespace ASCOM.AAF2
         /// ASCOM DeviceID (COM ProgID) for this driver.
         /// The DeviceID is used by ASCOM applications to load the driver at runtime.
         /// </summary>
-        internal static string driverID = "ASCOM.AAF2.Focuser";     // tekkydave
+        internal static string driverID = "ASCOM.Arduino.Focuser";     // tekkydave
         /// <summary>
         /// Driver description that displays in the ASCOM Chooser.
         /// </summary>
-        private static string driverDescription = "ASCOM Focuser Driver for AAF2.";     // tekkydave
+        private static string driverDescription = "ASCOM Focuser Driver for Arduino Focuser";     // tekkydave
 
         internal static string comPortProfileName = "COM Port"; // Constants used for Profile persistence
         internal static string comPortDefault = "COM1";
@@ -112,28 +112,28 @@ namespace ASCOM.AAF2
         private TraceLogger tl;
 
         /// <summary>
-        /// tekkydave - AAF2 object to hold all custom code relating to Arduino device
+        /// tekkydave - ArduinoFocuser object to hold all custom code relating to Arduino device
         /// </summary>
-        private AAF2 aaf2;  // tekkydave
+        private ArduinoFocuser aaf2;  // tekkydave
 
         #endregion
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AAF2"/> class.
+        /// Initializes a new instance of the <see cref="ArduinoFocuser"/> class.
         /// Must be public for COM registration.
         /// </summary>
         public Focuser()
         {
             ReadProfile(); // Read device configuration from the ASCOM Profile store
 
-            tl = new TraceLogger("c:\\trace\\AAF2\\Driver" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_Driver");      // tekkydave - Added path to trace file
+            tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_Driver");      // tekkydave - Added path to trace file
             tl.Enabled = traceState;
             tl.LogMessage("Focuser", "Starting initialisation");
 
             utilities = new Util(); //Initialise util object
             astroUtilities = new AstroUtils(); // Initialise astro utilities object
             //TODO: Implement your additional construction here
-            aaf2 = new AAF2(traceState);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
+            aaf2 = new ArduinoFocuser(traceState);  // tekkydave - instantiate aaf2 object for Arduino calls, passing in the tracestate.
             tl.LogMessage("Focuser", "Completed initialisation");
         }
 

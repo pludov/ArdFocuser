@@ -6,9 +6,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Windows.Forms;
 using ASCOM.Utilities;
-using ASCOM.AAF2;
+using ASCOM.Arduino;
 
-namespace ASCOM.AAF2
+namespace ASCOM.Arduino
 {
     [ComVisible(false)]					// Form not registered for COM!
     public partial class SetupDialogForm : Form

@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // associated with an assembly.
 //
 // TODO - Add your authorship information here
-[assembly: AssemblyTitle("ASCOM.AAF2.Focuser")]
-[assembly: AssemblyDescription("ASCOM Focuser driver for AAF2")]
+[assembly: AssemblyTitle("ASCOM.Arduino.Focuser")]
+[assembly: AssemblyDescription("ASCOM Focuser driver for Arduino Focuser")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("The ASCOM Initiative")]
-[assembly: AssemblyProduct("ASCOM Focuser driver for AAF2")]
+[assembly: AssemblyProduct("ASCOM Focuser driver for Arduino Focuser")]
 [assembly: AssemblyCopyright("Copyright © 2014 The ASCOM Initiative")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -22,7 +22,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(true)]    // tekkydave - changed from false to true
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("23cdf7af-1d11-4301-961b-434b6cb6ce2b")]
+[assembly: Guid("23cdf7af-1d11-4301-961b-434b6cb6ce3b")]
 
 // Version information for an assembly consists of the following four values:
 //

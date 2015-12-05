@@ -5,9 +5,9 @@ using System.Text;
 using ASCOM.Utilities;
 using System.Net.Sockets;
 
-namespace ASCOM.AAF2
+namespace ASCOM.Arduino
 {
-    public class AAF2 // : ASCOM.DeviceInterface.IFocuserV2
+    public class ArduinoFocuser // : ASCOM.DeviceInterface.IFocuserV2
     {
 
         //
@@ -548,17 +548,17 @@ namespace ASCOM.AAF2
         private static System.Net.Sockets.TcpClient clientSocket = new System.Net.Sockets.TcpClient();
         private static double stepsize = 1;                                 // No of steps to move focusser motor for each value in Move() call
         private static string driverInfo = "Ascom-Arduino Focuser V2.";     // Driver Info String
-        private static string name = "AAF2";                                // Driver Short Name
+        private static string name = "Arduino.Focuser";                                // Driver Short Name
         private TraceLogger tl;
 
-        public AAF2(bool traceState)
+        public ArduinoFocuser(bool traceState)
         {
-            tl = new TraceLogger("c:\\trace\\AAF2\\AAF2" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_aaf2");      // Trace Logger
+            tl = new TraceLogger("c:\\trace\\Arduino\\Focuser" + DateTime.Now.ToString("yyyyMMddHHmmss"), "AAF2_aaf2");      // Trace Logger
             tl.Enabled = traceState;
             tl.LogMessage("AAF2", "Constructed");
         }
 
-        ~AAF2() // Destructor
+        ~ArduinoFocuser() // Destructor
         {
             tl.Enabled = false;
             tl.Dispose();

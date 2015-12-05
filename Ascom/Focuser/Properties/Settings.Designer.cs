@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace ASCOM.AAF2.Properties {
+namespace ASCOM.Arduino.Properties {
     
     
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
