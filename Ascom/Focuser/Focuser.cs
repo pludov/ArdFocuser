@@ -609,12 +609,17 @@ namespace ASCOM.Arduino
         public void connect()
         {
             // try to connect to port
+            int tcpPort = driver.tcpPort;
+            if (tcpPort == -1)
+            {
+                tcpPort = 1501;
+            }
             try
             {
                 clientSocket.ReceiveTimeout = 10000;
                 clientSocket.SendTimeout = 10000;
                 // FIXME : le port
-                clientSocket.Connect("127.0.0.1", driver.tcpPort);
+                clientSocket.Connect("127.0.0.1", tcpPort);
                 
                 // Moved to socket: serialPort = new Serial();
                 // Moved to socket: serialPort.PortName = portName;
@@ -625,7 +630,7 @@ namespace ASCOM.Arduino
             }
             catch (Exception ex)
             {
-                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + driver.tcpPort + " - is ArduinoFocuserUI connected ?", ex);
+                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + tcpPort + " - is ArduinoFocuserUI connected ?", ex);
             }
 
             // Moved to socket: System.Threading.Thread.Sleep(2000);    // Wait 2s for connection to settle
