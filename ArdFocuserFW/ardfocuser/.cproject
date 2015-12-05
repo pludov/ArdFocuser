@@ -6,40 +6,39 @@
 				<externalSettings/>
 				<extensions>
 					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
-					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.MakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
 				</extensions>
 			</storageModule>
 			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
 				<configuration artifactName="${ProjName}" buildProperties="" description="" id="it.baeyens.arduino.core.toolChain.release.902326046" name="Release" parent="org.eclipse.cdt.build.core.emptycfg">
 					<folderInfo id="it.baeyens.arduino.core.toolChain.release.902326046.1836056982" name="/" resourcePath="">
-						<toolChain id="it.baeyens.arduino.core.toolChain.release.1402407302" name="Arduino Toolchain" superClass="it.baeyens.arduino.core.toolChain.release">
+						<toolChain id="it.baeyens.arduino.core.toolChain.release.1402407302" name="Arduino Toolchain" nonInternalBuilderId="it.baeyens.arduino.sketch.builder" superClass="it.baeyens.arduino.core.toolChain.release">
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="it.baeyens.arduino.targetplatform.1967593056" name="Arduino Target" osList="all" superClass="it.baeyens.arduino.targetplatform"/>
-							<builder buildPath="${workspace_loc:/ardfocuser}/Release" id="it.baeyens.arduino.sketch.builder.1921235768" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Arduino sketch builder" superClass="it.baeyens.arduino.sketch.builder"/>
+							<builder arguments="-r" buildPath="${workspace_loc:/ardfocuser}/Release" command="make" id="it.baeyens.arduino.sketch.builder.1188078211" keepEnvironmentInBuildfile="false" name="Arduino sketch builder" superClass="it.baeyens.arduino.sketch.builder"/>
 							<tool commandLinePattern="${A.RECIPE.CPP.O.PATTERN.1} ${FLAGS} -D__IN_ECLIPSE__=1 -x c++ ${INPUTS} ${A.RECIPE.CPP.O.PATTERN.2} ${OUTPUT} ${A.RECIPE.CPP.O.PATTERN.3} ${JANTJE.WARNING_LEVEL} ${JANTJE.EXTRA.COMPILE} ${JANTJE.EXTRA.CPP.COMPILE}" id="it.baeyens.arduino.tool.sketch.compiler.cpp.268546622" name="Arduino C++ Compiler" superClass="it.baeyens.arduino.tool.sketch.compiler.cpp">
 								<option id="it.baeyens.arduino.compiler.cpp.sketch.option.incpath.298927555" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.cpp.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/DHT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/OneWire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/DallasTemperature}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/Program Files/arduino-1.6.5-r5/hardware/tools/avr/avr/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/arduino/core}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/TimerOne}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/Libraries/DHT}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/arduino/variant}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/OneWire}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/Wire}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/Wire/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/DallasTemperature}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:/Program Files/arduino-1.5.5-r2/hardware/tools/avr/avr/include&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.cpp.sketch.input.783614100" name="CPP source files" superClass="it.baeyens.arduino.compiler.cpp.sketch.input"/>
 							</tool>
 							<tool id="it.baeyens.arduino.tool.compiler.c.1319676858" name="Arduino C Compiler" superClass="it.baeyens.arduino.tool.compiler.c">
 								<option id="it.baeyens.arduino.compiler.c.sketch.option.incpath.1795602765" name="Include Paths (-I)" superClass="it.baeyens.arduino.compiler.c.sketch.option.incpath" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/TimerOne}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/DHT}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/OneWire}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/OwnLibraries/EEPROM}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;C:/Program Files/arduino-1.6.5-r5/hardware/tools/avr/avr/include&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/arduino/core}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/arduino/variant}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/EEPROM}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/Wire}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/ardfocuser/Libraries/Wire/utility}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;C:/Program Files/arduino-1.5.5-r2/hardware/tools/avr/avr/include&quot;"/>
 								</option>
 								<inputType id="it.baeyens.arduino.compiler.c.sketch.input.155650311" name="C Source Files" superClass="it.baeyens.arduino.compiler.c.sketch.input"/>
 							</tool>
@@ -52,7 +51,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="Libraries/*/?xamples|Libraries/*/?xtras" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name=""/>
+						<entry excluding="Libraries/*/?xamples|Libraries/*/?xtras|CustomLibs" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

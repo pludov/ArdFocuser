@@ -9,6 +9,7 @@
 #include "MainLogic.h"
 #include "meteoTemp.h"
 #include "motor.h"
+#include "FilterWheelMotor.h"
 #include "voltmeter.h"
 #include "scopetemp.h"
 #include "pwmresistor.h"
@@ -22,11 +23,12 @@ extern PWMResistor resistor;
 
 
 
-
-static int pendingWrite()
-{
-	return (unsigned int)(SERIAL_BUFFER_SIZE + Serial._tx_buffer_head - Serial._tx_buffer_tail) % SERIAL_BUFFER_SIZE;
-}
+//
+//static int pendingWrite()
+//{
+//	Serial.availableForWrite()
+//	return (unsigned int)(SERIAL_TX_BUFFER_SIZE + Serial._tx_buffer_head - Serial._tx_buffer_tail) % SERIAL_TX_BUFFER_SIZE;
+//}
 
 Status::Status()
 {
@@ -50,10 +52,9 @@ void Status::needUpdate()
 void Status::tick()
 {
 	// Si on a de la place sur le buffer de sortie, alors on accepte
-	int toWait = pendingWrite();
-	if (toWait >= sizeof(struct Payload)) {
+	if (Serial.availableForWrite() < sizeof(struct Payload)) {
 		// Il faut attendre pendant au moins ce temps
-		this->nextTick = UTime::now() + (unsigned long)toWait * CHAR_XMIT_DELAY;
+		this->nextTick = UTime::now() + (sizeof(struct Payload) + 2) * CHAR_XMIT_DELAY;
 		return;
 	}
 	sendStatus();
@@ -123,13 +124,21 @@ Payload Status::getStatusPayload()
 
 	writeVolt(s.battery, voltmeter.lastValue());
 	writeHex(s.heater, 2, resistor.pct);
+	writeHex(s.filterwheel, 5, filterWheelMotor.getCurrentPosition());
+	if (filterWheelMotor.isMoving()) {
+		s.filterwheelState = 'M';
+	} else if (filterWheelMotor.lastCalibrationFailed()) {
+		s.filterwheelState = 'K';
+	} else {
+		s.filterwheelState = '0';
+	}
 	return s;
 }
 
 void Status::sendStatus()
 {
 #ifdef DEBUG
-	Serial.println(F("MMMMMS°sco°ext%%%VVVHH"));
+	Serial.println(F("MMMMMS°sco°ext%%%VVVHHFFFFFS"));
 #endif
 
 

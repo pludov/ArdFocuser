@@ -32,6 +32,7 @@
 #include "utime.h"
 #include "MainLogic.h"
 #include "Motor.h"
+#include "FilterWheelMotor.h"
 #include "Scheduler.h"
 #include "pwmresistor.h"
 #include "scopetemp.h"
@@ -60,7 +61,7 @@ const String programVersion = "2.3.0";
 #define DHTTYPE DHT22   // DHT 22  (AM2302)
 
 const uint8_t motorPins[4] = { 5, 6, 7, 8 }; // Declare pins to drive motor control board
-
+const uint8_t filterWheelPins[4] = {A3, A2, A1, A0};
 
 // Initialise the temp sensor
 OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with any OneWire devices
@@ -69,13 +70,14 @@ OneWire oneWire(ONE_WIRE_BUS); // Setup a oneWire instance to communicate with a
 int debug = 0;
 
 Motor motor(motorPins);
+FilterWheelMotor filterWheelMotor(filterWheelPins);
 PWMResistor resistor(RESISTORPIN);
 ScopeTemp scopeTemp(&oneWire);
 MeteoTemp meteoTemp(DHTPIN, DHTTYPE);
 Voltmeter voltmeter(7);
 MainLogic mainLogic;
 Status status;
-Scheduled * tasks [] = {&motor, &scopeTemp, &meteoTemp, &voltmeter, &mainLogic, &status, 0};
+Scheduled * tasks [] = {&motor, &filterWheelMotor, &scopeTemp, &meteoTemp, &voltmeter, &mainLogic, &status, 0};
 Scheduler scheduler(tasks);
 
 
@@ -148,6 +150,34 @@ void serialCommand(String command) {
 		serialIO.sendPacket("T" + targetPosS + ":OK");
 		break;
 	}
+	case 'F': // Set Filterwheel Position
+	{
+		if (!filterWheelMotor.lastCalibrationFailed()) {
+			String targetPosS = command.substring(1);
+			unsigned long targetPosI = targetPosS.toInt();
+			filterWheelMotor.setTargetPosition(targetPosI);
+			serialIO.sendPacket("F" + targetPosS + ":OK");
+		} else {
+#ifdef DEBUG
+			Serial.println(F("Move without calibration"));
+#endif
+			serialIO.sendPacket("F:ERR");
+		}
+
+		break;
+	}
+	case 'Q':
+	{
+
+		String targetPosS = command.substring(1);
+		unsigned long targetPosI = targetPosS.toInt();
+
+		filterWheelMotor.startCalibration(targetPosI);
+		serialIO.sendPacket("Q" + targetPosS + ":OK");
+
+		break;
+
+	}
 	case 'C': // Get Temperature
 	{
 		double t;
@@ -164,7 +194,7 @@ void serialCommand(String command) {
 		String initPosS = command.substring(1, hashpos);
 		unsigned long initPosI = initPosS.toInt();
 		motor.loadPosition(initPosI);
-		config.storedPosition.position = initPosI;
+		config.storedPosition().position = initPosI;
 		config.commitStoredPosition();
 
 		serialIO.sendPacket("I" + initPosS + ":OK");
@@ -206,6 +236,7 @@ void serialCommand(String command) {
 		serialIO.sendPacket('S', (uint8_t*)&statusPayload, sizeof(statusPayload));
 		break;
 	}
+
 	default: {
 		serialIO.sendPacket("ERR");
 		break;
@@ -236,7 +267,8 @@ void setup() {
 	Serial.println(F("done with init conf"));
 #endif
 
-	motor.loadPosition(config.storedPosition.position);
+	motor.loadConfigPosition();
+	filterWheelMotor.loadConfigPosition();
 #ifdef DEBUG
 	Serial.println(F("now reset search"));
 #endif

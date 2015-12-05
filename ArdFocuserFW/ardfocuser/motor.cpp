@@ -6,8 +6,6 @@
 
 // Number of steps to gain full speed
 #define maxAccelStep 100
-// At full speed, how short a step is ?
-#define fastestPerHalfStep 2200
 
 // Pause after a move, before cutting off signal
 #define pauseAfterMove ((unsigned long int)1000000)
@@ -22,8 +20,10 @@ static inline int8_t sgn(long val) {
 	return 1;
 }
 
-Motor::Motor(const uint8_t * pins)
+Motor::Motor(const uint8_t * pins, uint8_t positionConfigId, int fastestPerHalfStep)
 {
+	this->fastestPerHalfStep = fastestPerHalfStep;
+	this->positionConfigId = positionConfigId;
 	// What is the duration ?
 	this->tickExpectedDuration = US(150);
 	// Don't be late please
@@ -63,6 +63,15 @@ void Motor::loadPosition(unsigned long newPosition)
 {
 	this->targetPosition = newPosition;
 	this->currentPosition = newPosition;
+}
+
+void Motor::loadConfigPosition()
+{
+	loadPosition(positionConfig().position);
+}
+
+PositionStorage & Motor::positionConfig() {
+	return (*((PositionStorage*)config.getRawStorageData(positionConfigId)));
 }
 
 unsigned long Motor::getCurrentPosition()
@@ -137,15 +146,20 @@ void Motor::tick()
 
 		// Now compute the tick duration
 		if (distance - dir == 0) {
-			this->speedLevel = 0;
-			this->nextTick += pauseAfterMove;
-			status.needUpdate();
-			config.storedPosition.position = targetPosition;
-			config.commitStoredPosition();
+			targetPositionReached();
 		} else {
 			this->nextTick += getPulseDuration(abs(this->speedLevel));
 		}
 	}
+}
+
+void Motor::targetPositionReached()
+{
+	this->speedLevel = 0;
+	this->nextTick += pauseAfterMove;
+	status.needUpdate();
+	positionConfig().position = targetPosition;
+	config.commitStorage(positionConfigId);
 }
 
 long Motor::getPulseDuration(int speedLevel4) {
@@ -154,5 +168,6 @@ long Motor::getPulseDuration(int speedLevel4) {
 		speedLevel4 = maxAccelStep;
 	}
 	long result = ((long) fastestPerHalfStep * (long) maxAccelStep) / (1 + speedLevel4);
-	return 4 * result;
+
+	return result;
 }

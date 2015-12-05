@@ -28,12 +28,12 @@ void Voltmeter::tick()
 	unsigned int rawV = analogRead(pin);
 
 	// 627 => 11.89
-	unsigned int v = ((unsigned long)rawV * 100 * config.storedVoltmeter.voltmeter_mult) >> 17;
+	unsigned int v = ((unsigned long)rawV * 100 * config.storedVoltmeter().voltmeter_mult) >> 17;
 #ifdef DEBUG
 	Serial.print("V:");
 	Serial.println(v);
 #endif
-	this->nextTick += MS(2000);
+	this->nextTick += LongDuration::seconds(2);
 
 	if (this->lastv != v) {
 		this->lastv = v;

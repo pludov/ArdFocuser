@@ -8,6 +8,16 @@
 #ifndef CONFIG_H_
 #define CONFIG_H_
 
+// Nombre de storages
+#define STORAGE_COUNT 5
+// Taille d'un storage en octet
+#define STORAGE_SIZE 4
+
+#define ID_STORAGE_POSITION 0
+#define ID_STORAGE_RANGE 1
+#define ID_STORAGE_TEMPERATURE 2
+#define ID_STORAGE_VOLTMETER 3
+#define ID_STORAGE_FILTERWHEEL_POSITION 4
 
 struct PositionStorage {
 	uint32_t position;
@@ -50,29 +60,62 @@ struct VoltmeterStorage {
 /** Stocke la configuration */
 class Config {
 	bool initialised;
+	uint32_t data[STORAGE_COUNT];
+
+
 public:
 	Config();
 	~Config();
 
 	void init();
 
-	PositionStorage storedPosition;
-	void commitStoredPosition();
+	void commitStorage(uint8_t pos);
 
-	RangeStorage storedRange;
-	void commitStoredRange();
+	inline PositionStorage & storedPosition() {
+		return *(PositionStorage*)&data[ID_STORAGE_POSITION];
+	}
 
-	TemperatureStorage storedTemperature;
-	void commitStoredTemperature();
+	inline PositionStorage & storedFilterWheelPosition() {
+		return *(PositionStorage*)&data[ID_STORAGE_FILTERWHEEL_POSITION];
+	}
 
-	VoltmeterStorage storedVoltmeter;
-	void commitStoredVoltmeter();
+
+	inline void commitStoredPosition() {
+		commitStorage(ID_STORAGE_POSITION);
+	}
+
+	inline RangeStorage & storedRange() {
+		return *((RangeStorage*)&data[ID_STORAGE_RANGE]);
+	}
+
+	inline void commitStoredRange() {
+		commitStorage(ID_STORAGE_RANGE);
+	}
+
+	inline TemperatureStorage & storedTemperature() {
+		return *((TemperatureStorage*)&data[ID_STORAGE_TEMPERATURE]);
+	}
+
+	inline void commitStoredTemperature() {
+		commitStorage(ID_STORAGE_TEMPERATURE);
+	}
+
+	inline VoltmeterStorage & storedVoltmeter() {
+		return *((VoltmeterStorage*)&data[ID_STORAGE_VOLTMETER]);
+	}
+
+	inline void commitStoredVoltmeter() {
+		commitStorage(ID_STORAGE_VOLTMETER);
+	}
+
+	// Give address of a configuration slot by id
+	uint8_t* getRawStorageData(uint8_t storage);
 
 	float getTargetDeltaTemp() {
-		return 3 + storedVoltmeter.targetDewPoint / 10.0;
+		return 3 + storedVoltmeter().targetDewPoint / 10.0;
 	}
 	int getPwmStep() {
-		return pow(2, storedVoltmeter.pwmAggressiveness / 8.0);
+		return pow(2, storedVoltmeter().pwmAggressiveness / 8.0);
 	}
 };
 

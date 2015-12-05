@@ -46,6 +46,12 @@ struct Payload
 	char battery[3];
 	// Hexa
 	char heater[2];
+	// Position de la roue à filtre, de 0 à 262k
+	char filterwheel[5];
+	// K: calibration failed
+	// M: moving
+	// 0: idle
+	char filterwheelState;
 } ;
 
 

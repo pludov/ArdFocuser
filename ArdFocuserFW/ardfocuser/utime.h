@@ -8,6 +8,8 @@
 #ifndef UTIME_H_
 #define UTIME_H_
 
+#include <Arduino.h>
+
 class ShortDuration
 {
 	friend class UTime;
@@ -224,8 +226,7 @@ public:
 	}
 };
 
-
-#define MS(x) ShortDuration((125 * (long)x) / 2);
-#define US(x) ShortDuration(x / 16);
+#define MS(x) ShortDuration((125 * (long)(x)) / 2);
+#define US(x) ShortDuration((x) / 16);
 
 #endif /* UTIME_H_ */
