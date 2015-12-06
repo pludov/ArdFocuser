@@ -26,6 +26,10 @@ public class ConditionPanel extends ConditionPanelDesign {
 			@Override
 			public void broadcastError(String string) {
 			}
+			
+			@Override
+			public void filterDefinitionChanged() {
+			}
 		});
 		
 		loadLabels();

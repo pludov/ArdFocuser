@@ -43,6 +43,10 @@ public class ConnectionPanel extends ConnectionPanelDesign {
 			@Override
 			public void parametersChanged() {
 			}
+			
+			@Override
+			public void filterDefinitionChanged() {
+			}
 		});
 		
 		this.btnConnect.addActionListener(new ActionListener() {

@@ -24,6 +24,7 @@ public class MainWindow extends JFrame {
 	StatusBar statusBar;
 	ConnectionPanel connectionPanel;
 	MotorStatusPanel motorStatusPanel;
+	FilterWheelPanel filterWheelPanel;
 	ConditionPanel conditionPanel;
 	Focuser focuser;
 	
@@ -43,6 +44,9 @@ public class MainWindow extends JFrame {
 		
 		motorStatusPanel = new MotorStatusPanel(focuser);
 		mpd.focuseurPanel.add(motorStatusPanel);
+		
+		filterWheelPanel = new FilterWheelPanel(focuser);
+		mpd.filterWheelPanel.add(filterWheelPanel);
 		
 		conditionPanel = new ConditionPanel(focuser);
 		mpd.conditionPanel.add(conditionPanel);

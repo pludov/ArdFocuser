@@ -25,6 +25,11 @@ public class Client {
 	static final char GetVersionCommand = 'V';
 	static final char GetRangeCommand = 'R';
 	
+	static final char GetFilters = 'N';
+	static final char GetFilterPos = 'F';
+	static final char ActivateFilter = 'A';
+	
+	
 	int clientId;
 	Focuser focuser;
 	Socket socket;
@@ -60,6 +65,10 @@ public class Client {
 			@Override
 			public void parametersChanged() {
 				statusReceivedSincePreviousOrder = true;
+			}
+			
+			@Override
+			public void filterDefinitionChanged() {
 			}
 			
 			@Override
@@ -152,6 +161,10 @@ public class Client {
 						}
 					}
 
+					@Override
+					public void filterDefinitionChanged() {
+					}
+					
 					@Override
 					public void broadcastError(String string) {
 					}
@@ -272,6 +285,69 @@ public class Client {
 				return request;
 			}
 
+			case ActivateFilter:
+			{
+				int pos;
+				
+				try {
+					int filter = Integer.parseInt(command.substring(1));
+					if (filter < 0 || filter >= focuser.getFilterDefinitions().size()) throw new Exception("invalid filter id");
+					pos = focuser.getFilterDefinitions().get(filter).getPosition();
+				} catch(Exception e) {
+					ClientRequest result = new ClientRequest();
+					result.setError();
+					return result;
+				}
+				// FIXME: c'est bien F ?
+				FocuserRequestFromClient request = new FocuserRequestFromClient("F" + pos) {
+					@Override
+					void onReply(String reply) {
+						result = reply + "#";
+						statusReceivedSincePreviousOrder = false;
+						setDone();
+					}
+				};
+				return request;
+			}
+			case GetFilterPos:
+			{
+				WaitStatusUpdate response = new WaitStatusUpdate() {
+					@Override
+					void onStatusReady() {
+						int filter;
+
+						if (focuser.getFilterWheelState() == null) {
+							filter = -1;
+						} else {
+							switch(focuser.getFilterWheelState()) {
+							case FailedCalibration:
+							case MovingCalibration:
+							case Moving:
+								filter = -1;
+								break;
+							case Idle:
+								filter = -1;
+								for(int i = 0; i < focuser.getFilterDefinitions().size(); ++i) {
+									if (focuser.getFilterWheelPosition() == focuser.getFilterDefinitions().get(i).getPosition()) {
+										filter = i;
+										break;
+									}
+								}
+								break;
+							default:
+								throw new RuntimeException("internal error");
+							
+							}
+						}
+						
+						result = "" + GetFilterPos +  filter + ":OK#";
+					}
+				};
+				response.start();
+				return response;
+			}
+			
+
 			case HaltCommand:
 			{
 				final String focuserCommand = command;
@@ -310,6 +386,8 @@ public class Client {
 				fallback.setError();
 				return fallback;
 			}
+			
+			
 		}
 		
 	}
