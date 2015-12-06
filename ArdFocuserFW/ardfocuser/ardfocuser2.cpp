@@ -1,12 +1,12 @@
 //------------------------------------------------------------------
 // Ascom-Arduino Focusser
-// Dave Wells
-// Thanks for code snippets & inspiration:
+// Forker from works of Dave Wells,
+// With thanks for code snippets & inspiration:
 //  o  Gina (Stargazers Lounge) for the stepper control basics
 //  o  russellhq  (Stargazers Lounge) for the 1-wire code and info.
 //------------------------------------------------------------------
 
-//------ Change Log ------------------------------------------------
+//------ Change Log for AAF2 -------------------------------------------
 //  Version    Date        Change
 //  0.0.2      26/05/2014  Initial - copied from Windows version
 //  2.0.0      22/06/2014  Renumbered to match Ascom Driver Numbering
@@ -166,7 +166,7 @@ void serialCommand(String command) {
 
 		break;
 	}
-	case 'Q':
+	case 'Q': // Calibration
 	{
 
 		String targetPosS = command.substring(1);
@@ -206,6 +206,12 @@ void serialCommand(String command) {
 		serialIO.sendPacket("P" + currentPositionS + ":OK");
 		break;
 	}
+	case 'f': // Get current filterwheel position and status
+	{
+		String currentPositionS = String(filterWheelMotor.getCurrentPosition()) + String(filterWheelMotor.getProtocolStatus());
+		serialIO.sendPacket("f" + currentPositionS + ":OK");
+		break;
+	}
 	case 'H': // Halt
 	{
 		unsigned long where = motor.getCurrentPosition();
@@ -236,7 +242,31 @@ void serialCommand(String command) {
 		serialIO.sendPacket('S', (uint8_t*)&statusPayload, sizeof(statusPayload));
 		break;
 	}
+	case 'Z':
+	{
+		// Acces à la conf
+		int eq;
+		if ((eq = command.indexOf('=')) == -1) {
+			String initPosS = command.substring(1);
+			unsigned long initPosI = initPosS.toInt();
+			char reply[9];
 
+			writeHex(reply, 8, *(uint32_t*)config.getRawStorageData(initPosI));
+			reply[8] = 0;
+
+			serialIO.sendPacket('Z', (uint8_t*)&reply, 8);
+		} else {
+			String initPosS = command.substring(1, eq);
+			String val = command.substring(eq + 1);
+			unsigned long initPosI = initPosS.toInt();
+
+			uint32_t v = readHex(val);
+			*((uint32_t*)config.getRawStorageData(initPosI)) = v;
+			config.commitStorage(initPosI);
+			serialIO.sendPacket("Z:OK");
+		}
+		break;
+	}
 	default: {
 		serialIO.sendPacket("ERR");
 		break;

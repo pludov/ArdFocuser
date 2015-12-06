@@ -48,9 +48,11 @@ struct Payload
 	char heater[2];
 	// Position de la roue à filtre, de 0 à 262k
 	char filterwheel[5];
-	// K: calibration failed
-	// M: moving
-	// 0: idle
+	// See FilterWheelMotor.h:
+	//  K: calibration failed
+	//  C: calibration running
+	//  M: moving
+	//  I: idle
 	char filterwheelState;
 } ;
 
@@ -70,6 +72,7 @@ public:
 
 extern Status status;
 
-
+void writeHex(char * buff, int length, uint32_t value);
+uint32_t readHex(String & val);
 
 #endif /* STATUS_H_ */

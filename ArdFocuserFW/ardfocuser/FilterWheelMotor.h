@@ -11,6 +11,12 @@
 #include "motor.h"
 #include "Config.h"
 
+#define FILTER_WHEEL_STATUS_CALIBRATION_FAILED 'K'
+#define FILTER_WHEEL_STATUS_CALIBRATION_RUNNING 'C'
+#define FILTER_WHEEL_STATUS_MOVING 'M'
+#define FILTER_WHEEL_STATUS_IDLE 'I'
+
+
 class FilterWheelMotor: public Motor {
 	bool calibrating;
 	unsigned long calibrationTarget;
@@ -36,6 +42,8 @@ public:
 	void startCalibration(unsigned long target);
 
 	bool lastCalibrationFailed() { return calibrationState; }
+
+	char getProtocolStatus();
 };
 
 

@@ -211,7 +211,7 @@ void Config::init()
 
 void Config::commitStorage(uint8_t pos)
 {
-	writeStorage(ID_STORAGE_POSITION, (uint8_t*)&data[pos]);
+	writeStorage(pos, (uint8_t*)&data[pos]);
 }
 
 uint8_t* Config::getRawStorageData(uint8_t pos)

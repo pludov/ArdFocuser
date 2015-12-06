@@ -62,7 +62,7 @@ void Status::tick()
 }
 
 
-static void writeHex(char * buff, int length, unsigned long value)
+void writeHex(char * buff, int length, uint32_t value)
 {
 	while(length > 0) {
 		length--;
@@ -74,6 +74,29 @@ static void writeHex(char * buff, int length, unsigned long value)
 		}
 		value = value >> 4;
 	}
+}
+
+uint32_t readHex(String & val)
+{
+	uint32_t result = 0;
+	int shift = 0;
+	for(int i = val.length() - 1; i>= 0; --i)
+	{
+		char c = val[i];
+		uint32_t v;
+		if (c >= 'a' && c <= 'f') {
+			v = 10 + c - 'a';
+		} else if (c >= 'A' && c <= 'F') {
+			v = 10 + c - 'A';
+		} else if (c >= '0' && c <= '9') {
+			v = c - '0';
+		} else {
+			continue;
+		}
+		result = result | (v << shift);
+		shift += 4;
+	}
+	return result;
 }
 
 static void writeBlank(char * buffer, int length)
@@ -125,13 +148,7 @@ Payload Status::getStatusPayload()
 	writeVolt(s.battery, voltmeter.lastValue());
 	writeHex(s.heater, 2, resistor.pct);
 	writeHex(s.filterwheel, 5, filterWheelMotor.getCurrentPosition());
-	if (filterWheelMotor.isMoving()) {
-		s.filterwheelState = 'M';
-	} else if (filterWheelMotor.lastCalibrationFailed()) {
-		s.filterwheelState = 'K';
-	} else {
-		s.filterwheelState = '0';
-	}
+	s.filterwheelState = filterWheelMotor.getProtocolStatus();
 	return s;
 }
 

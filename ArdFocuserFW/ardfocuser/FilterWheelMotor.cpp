@@ -46,6 +46,8 @@ void FilterWheelMotor::startCalibration(unsigned long target)
 	setHallStatus(true);
 	loadPosition(50000);
 	setTargetPosition(0);
+
+	status.needUpdate();
 }
 
 bool FilterWheelMotor::readHall()
@@ -76,6 +78,7 @@ void FilterWheelMotor::targetPositionReached()
 		positionConfig().position = POS_INVALID;
 		config.commitStorage(positionConfigId);
 		setHallStatus(false);
+		status.needUpdate();
 		return;
 	}
 	Motor::targetPositionReached();
@@ -89,6 +92,7 @@ void FilterWheelMotor::tick()
 			calibrating = false;
 			calibrationState = false;
 			loadPosition(0);
+			status.needUpdate();
 			setTargetPosition(calibrationTarget);
 #ifdef DEBUG
 			Serial.println(F("calibration succeded"));
@@ -99,3 +103,19 @@ void FilterWheelMotor::tick()
 	}
 	Motor::tick();
 }
+
+char FilterWheelMotor::getProtocolStatus()
+{
+	if (isMoving()) {
+		if (calibrating) {
+			return FILTER_WHEEL_STATUS_CALIBRATION_RUNNING;
+		} else {
+			return FILTER_WHEEL_STATUS_MOVING;
+		}
+	} else if (lastCalibrationFailed()) {
+		return FILTER_WHEEL_STATUS_CALIBRATION_FAILED;
+	} else {
+		return FILTER_WHEEL_STATUS_IDLE;
+	}
+}
+
