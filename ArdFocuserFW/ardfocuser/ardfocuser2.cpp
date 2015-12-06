@@ -283,7 +283,25 @@ void setup() {
 	Serial.begin(115200);
 	delay(500);
 #ifdef DEBUG
-	Serial.println("Welcome on board");
+	Serial.println(F("Welcome on board"));
+	Serial.println(F("Commands are"));
+	Serial.println(F("X - confirm"));
+	Serial.println(F("T? - set focuser pos"));
+	Serial.println(F("F? - set fw pos"));
+	Serial.println(F("Q? - calibrate fw to pos"));
+	Serial.println(F("C - get temp"));
+	Serial.println(F("I? - set focuser pos"));
+	Serial.println(F("P - get focuser pos"));
+	Serial.println(F("f - get fw pos & status"));
+	Serial.println(F("H - halt focuser"));
+	Serial.println(F("M - is focuser moving"));
+	Serial.println(F("V - version"));
+	Serial.println(F("S - query status"));
+	Serial.println(F("Z? - get conf item"));
+	Serial.println(F("Z?=HEX - set conf item"));
+
+
+
 	delay(500);
 #endif
 	// reserve 200 bytes for the ASCOM driver inputString:

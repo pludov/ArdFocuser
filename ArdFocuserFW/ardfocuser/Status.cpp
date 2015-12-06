@@ -58,7 +58,11 @@ void Status::tick()
 		return;
 	}
 	sendStatus();
-	this->nextTick += LongDuration::seconds(10);
+	if (motor.isMoving() || filterWheelMotor.isMoving()) {
+		this->nextTick += MS(250);
+	} else {
+		this->nextTick += LongDuration::seconds(10);
+	}
 }
 
 

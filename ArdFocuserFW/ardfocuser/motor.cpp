@@ -99,6 +99,7 @@ void Motor::setTargetPosition(unsigned long newPosition)
 	}
 
 	this->targetPosition = newPosition;
+	status.needUpdate();
 }
 
 bool Motor::isActive()
