@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project default="dist" name="Create Runnable Jar for Project ArdFocuserUi">
+    <!--this file was created by Eclipse Runnable JAR Export Wizard-->
+    <!--ANT 1.7 is required                                        -->
+    <!--define folder properties-->
+    <property name="dir.buildfile" value="."/>
+    <property name="dir.workspace" value="C:/Documents and Settings/utilisateur/Mes documents/workspace/workspace-perso"/>
+    <property name="dir.jarfile" value="${dir.buildfile}/dist"/>
+	<property name="launch4j.dir" value="${dir.buildfile}/tools/launch4j"/>
+    <target name="create_run_jar">
+        <jar destfile="${dir.jarfile}/ArdFocuserUi.jar" filesetmanifest="mergewithoutmain">
+            <manifest>
+                <attribute name="Main-Class" value="fr.pludov.ardfocuser.ui.MainWindow"/>
+                <attribute name="Class-Path" value="."/>
+            </manifest>
+            <fileset dir="${dir.buildfile}/bin"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/miglayout15-swing.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="${dir.buildfile}/jars/jssc.jar"/>
+        </jar>
+    </target>
+	
+	<property name="launch4j.dir" location="tools/launch4j"/>
+	
+	<taskdef name="launch4j"
+	    classname="net.sf.launch4j.ant.Launch4jTask"
+	    classpath="${launch4j.dir}/launch4j.jar
+	        :${launch4j.dir}/lib/xstream.jar" />
+	<target name="create_exe" depends="create_run_jar">
+		<launch4j configFile="./launch4j.xml"/>
+		<delete file="dist/ArdFocuserUi.jar"/>
+	</target>
+	
+	<target name="dist" depends="create_exe">
+		<mkdir dir="dist/dll"/>
+		<copy todir="dist/dll" overwrite="true">
+			<fileset dir="jars">
+				<include name="**/*.exe"/>
+			</fileset>
+		</copy>
+	</target>
+	
+</project>
