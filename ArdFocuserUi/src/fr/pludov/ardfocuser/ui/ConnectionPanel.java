@@ -1,26 +1,16 @@
 package fr.pludov.ardfocuser.ui;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.lang.ProcessBuilder.Redirect;
-import java.util.Dictionary;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.awt.*;
+import java.awt.event.*;
+import java.io.*;
+import java.lang.ProcessBuilder.*;
+import java.util.regex.*;
 
-import javax.swing.JOptionPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
 
-import jssc.SerialPort;
-import fr.pludov.ardfocus.utils.WeakListenerOwner;
-import fr.pludov.ardfocuser.driver.Focuser;
-import fr.pludov.ardfocuser.driver.FocuserStatus;
-import fr.pludov.ardfocuser.driver.IFocuserListener;
+import fr.pludov.ardfocus.utils.*;
+import fr.pludov.ardfocuser.driver.*;
+import jssc.*;
 
 public class ConnectionPanel extends ConnectionPanelDesign {
 	
@@ -42,6 +32,10 @@ public class ConnectionPanel extends ConnectionPanelDesign {
 			
 			@Override
 			public void parametersChanged() {
+			}
+			
+			@Override
+			public void filterDefinitionChanged() {
 			}
 		});
 		
@@ -158,7 +152,8 @@ public class ConnectionPanel extends ConnectionPanelDesign {
 //				comboBoxPortList.addItem(portId.getName());
 //			}
 //		}
-		ProcessBuilder pb = new ProcessBuilder("C:\\Documents and Settings\\utilisateur\\git\\ArdFocuser\\ArdFocuserUi\\jars\\listComPorts.exe");
+		//C:\\Documents and Settings\\utilisateur\\git\\ArdFocuser\\ArdFocuserUi\\jars\\
+		ProcessBuilder pb = new ProcessBuilder("listComPorts.exe");
 		Redirect output = pb.redirectOutput();
 		
 		Process p;

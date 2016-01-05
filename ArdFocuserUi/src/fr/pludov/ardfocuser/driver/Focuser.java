@@ -1,5 +1,6 @@
 package fr.pludov.ardfocuser.driver;
 
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.prefs.BackingStoreException;
+import java.util.prefs.Preferences;
 
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -38,7 +41,6 @@ public class Focuser {
 	String handShake;
 	Timer handShakeTimer;
 	int handShakeFailedCount;
-	
 	
 	/** Status au niveau communication */
 	FocuserStatus currentStatus;
@@ -68,6 +70,12 @@ public class Focuser {
 	/** null while uninitialized or N/A */
 	Double heater;
 	
+	/** -1 while uninitialized */
+	int filterWheelPosition;
+	/** null while uninitialized */
+	FilterWheelMotorStatus filterWheelState;
+	
+	final List<FilterDefinition> filterDefinitions;
 	
 	public Focuser() {
 		this.currentStatus = FocuserStatus.Disconnected;
@@ -75,7 +83,10 @@ public class Focuser {
 		this.pendingRequests = new LinkedList<>();
 		this.currentRequest = null;
 		this.clients = new HashSet<>();
+		this.filterDefinitions = new ArrayList<>();
+		
 		clearParameters();
+		loadFilterDefinitions();
 	}
 
 	void clearParameters()
@@ -87,6 +98,8 @@ public class Focuser {
 		extHum = null;
 		battery = null;
 		heater = null;
+		filterWheelPosition = -1;
+		filterWheelState = null;
 	}
 	
 	public FocuserStatus getCurrentStatus()
@@ -297,7 +310,7 @@ public class Focuser {
 	private void decodeState(String status)
 	{
 		status = status.substring(1);
-		if (status.length() != 22) {
+		if (status.length() != 28) {
 			closeWithError("Wrong status encoding");
 		}
 		String motor = status.substring(0, 0 + 5);
@@ -309,7 +322,10 @@ public class Focuser {
 		this.extHum = decodeHum(status.substring(14, 14 + 3));
 		this.battery = decodeVolt(status.substring(17, 17 + 3));
 		this.heater = decodePct(status.substring(20, 20 + 2));
-		
+		String filterWheel = status.substring(22, 22 + 5);
+		this.filterWheelPosition = Integer.parseInt(filterWheel, 16);
+		char motorStateC = status.charAt(27);
+		this.filterWheelState = FilterWheelMotorStatus.fromProtocol(motorStateC);
 		Logger.stateUpdated(this);
 		
 		listeners.getTarget().parametersChanged();
@@ -611,5 +627,93 @@ public class Focuser {
 
 	public int getMaxMotorPosition() {
 		return 200000;
+	}
+
+	public int getFilterWheelPosition() {
+		return filterWheelPosition;
+	}
+
+	public FilterWheelMotorStatus getFilterWheelState() {
+		return filterWheelState;
+	}
+
+	public List<FilterDefinition> getFilterDefinitions() {
+		return filterDefinitions;
+	}
+	
+	private static final String filterCount = "filterCount";
+	private static final String filterName = "filterName";
+	private static final String filterColor = "filterColor";
+	private static final String filterPosition = "filterPosition";
+	private static final String [] channels = new String[]{"r", "g", "b" };
+
+	private void loadFilterDefinitions()
+	{
+		Preferences prefs = Preferences.userNodeForPackage(Focuser.class);
+		
+		
+		this.filterDefinitions.clear();
+		int count = prefs.getInt(filterCount, 0);
+		FilterLoop: for(int i = 0; i < count; ++i)
+		{
+			try {
+				FilterDefinition fd = new FilterDefinition();
+				
+				String name = prefs.get(filterName + "." + i, null);
+				if (name == null) {
+					continue;
+				}
+				fd.setName(name);
+				
+				int position = prefs.getInt(filterPosition + "." + i, -1);
+				if (position <= 0) {
+					continue;
+				}
+				fd.setPosition(position);
+				
+	
+				int [] values = new int[channels.length]; 
+				for(int channel = 0; channel < channels.length; ++channel) {
+					values[channel] = prefs.getInt(filterColor+"." + i + "." + channels[channel], -1);
+					if (values[channel] < 0) {
+						continue FilterLoop;
+					}
+				}
+				Color c = new Color(values[0], values[1], values[2]);
+				fd.setColor(c);
+				
+				this.filterDefinitions.add(fd);
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	
+	public void saveFilterDefinitions()
+	{
+		Preferences prefs = Preferences.userNodeForPackage(Focuser.class);
+		
+		prefs.putInt(filterCount, this.filterDefinitions.size());
+		for(int i = 0; i < this.filterDefinitions.size(); ++i)
+		{
+			FilterDefinition fd = this.filterDefinitions.get(i);
+			prefs.putInt(filterPosition + "." + i, fd.getPosition());
+			
+			prefs.put(filterName + "." + i, fd.getName());
+			
+			int [] values = new int[]{fd.getColor().getRed(), fd.getColor().getGreen(), fd.getColor().getBlue()};
+			for(int channel = 0; channel < channels.length; ++channel)
+			{
+				prefs.putInt(filterColor+"." + i + "." + channels[channel], values[channel]);
+			}
+		}
+		try {
+			prefs.flush();
+		} catch (BackingStoreException e) {
+			e.printStackTrace();
+		}
+		
+		this.listeners.getTarget().filterDefinitionChanged();
 	}
 }

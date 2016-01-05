@@ -44,6 +44,10 @@ public class MotorStatusPanel extends MotorStatusPanelDesign {
 			}
 			
 			@Override
+			public void filterDefinitionChanged() {
+			}
+			
+			@Override
 			public void broadcastError(String string) {
 			}
 		});
@@ -144,7 +148,7 @@ public class MotorStatusPanel extends MotorStatusPanelDesign {
 			this.controlPanel.btonFastForward.setEnabled(false);
 		} else {
 			this.posParameter.setText(Integer.toString(focuser.getMotorPosition()));
-			this.moveParameter.setText(focuser.getMotorState() ? "Déplacement en cours" : "");
+			this.moveParameter.setText(focuser.getMotorState() ? "Déplacement en cours" : " ");
 			
 			int mpos = focuser.getMotorPosition();
 			int maxPos = focuser.getMaxMotorPosition();

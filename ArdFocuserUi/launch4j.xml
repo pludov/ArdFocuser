@@ -1,0 +1,26 @@
+<launch4jConfig>
+  <dontWrapJar>false</dontWrapJar>
+  <headerType>gui</headerType>
+  <jar>dist\ArdFocuserUi.jar</jar>
+  <outfile>dist\ArdFocuserUi.exe</outfile>
+  <errTitle>ArdFocuserUi</errTitle>
+  <cmdLine></cmdLine>
+  <chdir></chdir>
+  <priority>normal</priority>
+  <downloadUrl>http://java.com/download</downloadUrl>
+  <supportUrl>http://pludov.blogspot.fr/</supportUrl>
+  <stayAlive>false</stayAlive>
+  <manifest></manifest>
+  <icon>src/fr/pludov/ardfocuser/ui/db32.ico</icon>
+  <var>PATH=%EXEDIR%\dll;%PATH%</var>
+  <jre>
+    <path></path>
+    <bundledJre64Bit>false</bundledJre64Bit>
+    <minVersion>1.7.0</minVersion>
+    <maxVersion></maxVersion>
+    <jdkPreference>preferJre</jdkPreference>
+    <initialHeapSize>32</initialHeapSize>
+    <maxHeapSize>128</maxHeapSize>
+    <maxHeapPercent>60</maxHeapPercent>
+  </jre>
+</launch4jConfig>

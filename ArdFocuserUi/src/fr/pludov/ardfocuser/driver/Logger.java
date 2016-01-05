@@ -92,7 +92,9 @@ public class Logger {
 				+ encodeCsvField(formatDouble(f.extTemp, 2))
 				+ encodeCsvField(formatDouble(f.extHum, 1))
 				+ encodeCsvField(formatDouble(f.battery, 2))
-				+ encodeCsvField(formatDouble(f.heater, 1)));
+				+ encodeCsvField(formatDouble(f.heater, 1))
+				+ encodeCsvField(Integer.toString(f.filterWheelPosition))
+				+ encodeCsvField(f.filterWheelState.name()));
 	}
 	
 	private Logger() {

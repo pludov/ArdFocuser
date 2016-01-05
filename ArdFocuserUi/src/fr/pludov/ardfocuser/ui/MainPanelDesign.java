@@ -11,12 +11,13 @@ public class MainPanelDesign extends JPanel {
 	protected JPanel connectionPanel;
 	protected JPanel focuseurPanel;
 	protected JPanel conditionPanel;
+	protected JPanel filterWheelPanel;
 
 	/**
 	 * Create the panel.
 	 */
 	public MainPanelDesign() {
-		setLayout(new MigLayout("", "[grow]", "[][][]"));
+		setLayout(new MigLayout("", "[grow]", "[][][][]"));
 		
 		this.connectionPanel = new JPanel();
 		add(this.connectionPanel, "cell 0 0,grow");
@@ -27,9 +28,14 @@ public class MainPanelDesign extends JPanel {
 		add(this.focuseurPanel, "cell 0 1,grow");
 		this.focuseurPanel.setLayout(new BorderLayout(0, 0));
 		
+		this.filterWheelPanel = new JPanel();
+		this.filterWheelPanel.setBorder(new TitledBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null), "Roue \u00E0 filtres", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(this.filterWheelPanel, "cell 0 2,grow");
+		this.filterWheelPanel.setLayout(new BorderLayout(0, 0));
+		
 		this.conditionPanel = new JPanel();
 		this.conditionPanel.setBorder(new TitledBorder(new BevelBorder(BevelBorder.LOWERED, null, null, null, null), "Conditions", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		add(this.conditionPanel, "cell 0 2,grow");
+		add(this.conditionPanel, "cell 0 3,grow");
 		this.conditionPanel.setLayout(new BorderLayout(0, 0));
 
 	}

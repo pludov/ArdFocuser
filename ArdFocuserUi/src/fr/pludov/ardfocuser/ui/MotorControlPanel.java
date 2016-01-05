@@ -15,7 +15,7 @@ public class MotorControlPanel extends JPanel {
 	 * Create the panel.
 	 */
 	public MotorControlPanel() {
-		setLayout(new MigLayout("", "[grow,right][][][][grow,left]", "[]"));
+		setLayout(new MigLayout("insets 1", "[grow,right][][][][grow,left]", "[]"));
 		
 		this.btonFastBackward = new JButton("<<");
 		add(this.btonFastBackward, "cell 0 0");

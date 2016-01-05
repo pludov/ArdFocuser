@@ -44,6 +44,10 @@ public class StatusBar extends JPanel {
 			}
 			
 			@Override
+			public void filterDefinitionChanged() {
+			}
+			
+			@Override
 			public void broadcastError(String string) {
 				statusLabel.setText(string);
 			}
