@@ -63,7 +63,7 @@ namespace ASCOM.Arduino
     // The ClassInterface/None addribute prevents an empty interface called
     // _Arduino from being created and used as the [default] interface
     //
-    
+
     /// <summary>
     /// ASCOM Focuser Driver for ArduinoFocuser.
     /// </summary>
@@ -89,9 +89,10 @@ namespace ASCOM.Arduino
         /// Initializes a new instance of the <see cref="ArduinoFocuser"/> class.
         /// Must be public for COM registration.
         /// </summary>
-        public Focuser() : base("Focuser", focuserDriverID, focuserDriverDescription, 2)
+        public Focuser()
+            : base("Focuser", focuserDriverID, focuserDriverDescription, 2)
         {
-            
+
         }
 
         //
@@ -237,7 +238,7 @@ namespace ASCOM.Arduino
         /// This is harmless if the driver is already registered/unregistered.
         /// </summary>
         /// <param name="bRegister">If <c>true</c>, registers the driver, otherwise unregisters it.</param>
-        private static void RegUnregASCOM(bool bRegister)
+        public static void RegUnregASCOM(bool bRegister)
         {
             using (var P = new ASCOM.Utilities.Profile())
             {
@@ -273,7 +274,7 @@ namespace ASCOM.Arduino
         [ComRegisterFunction]
         public static void RegisterASCOM(Type t)
         {
-            RegUnregASCOM(true);
+            Focuser.RegUnregASCOM(true);
         }
 
         /// <summary>
@@ -296,9 +297,8 @@ namespace ASCOM.Arduino
         [ComUnregisterFunction]
         public static void UnregisterASCOM(Type t)
         {
-            RegUnregASCOM(false);
+            Focuser.RegUnregASCOM(false);
         }
-
         #endregion
 
 

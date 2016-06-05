@@ -129,15 +129,15 @@ namespace ASCOM.Arduino
             get
             {
                 logMessage("Position Get", true.ToString());
-                // fixme
-                return p; // focuser.getFilterWheelCurrentFilter();
+                short result = focuser.getFilterWheelCurrentFilter();
+                logMessage("Position Get=>", result.ToString());
+                return result;
             }
             set
             {
                 logMessage("Position Set", value.ToString());
-                // fixme
+                focuser.setFilterWheelCurrentFilter(value);
                 p = value;
-                // return focuser.setFilterWheelCurrentFilter(value);
             }
         }
 
@@ -159,7 +159,7 @@ namespace ASCOM.Arduino
         /// This is harmless if the driver is already registered/unregistered.
         /// </summary>
         /// <param name="bRegister">If <c>true</c>, registers the driver, otherwise unregisters it.</param>
-        private static void RegUnregASCOM(bool bRegister)
+        public static void RegUnregASCOM(bool bRegister)
         {
             using (var P = new ASCOM.Utilities.Profile())
             {
@@ -174,6 +174,7 @@ namespace ASCOM.Arduino
                 }
             }
         }
+
 
         /// <summary>
         /// This function registers the driver with the ASCOM Chooser and
@@ -195,7 +196,7 @@ namespace ASCOM.Arduino
         [ComRegisterFunction]
         public static void RegisterASCOM(Type t)
         {
-            RegUnregASCOM(true);
+            FilterWheel.RegUnregASCOM(true);
         }
 
         /// <summary>
@@ -218,7 +219,7 @@ namespace ASCOM.Arduino
         [ComUnregisterFunction]
         public static void UnregisterASCOM(Type t)
         {
-            RegUnregASCOM(false);
+            FilterWheel.RegUnregASCOM(false);
         }
 
         #endregion

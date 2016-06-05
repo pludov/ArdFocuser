@@ -21,8 +21,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_1338EA1C708FA9B6A3A470C5A639C450"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_4A31302E253177C182FCE2491E5635C8"
         "OwnerKey" = "8:_1338EA1C708FA9B6A3A470C5A639C450"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4A31302E253177C182FCE2491E5635C8"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -41,6 +53,12 @@
         {
         "MsmKey" = "8:_4D03316FA567C72EE129F1261F478294"
         "OwnerKey" = "8:_5C0405D897084936B71D0B47752E6919"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_4D03316FA567C72EE129F1261F478294"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -70,6 +88,12 @@
         "Entry"
         {
         "MsmKey" = "8:_772BC6B53498A324AED26111DD1B16DB"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_772BC6B53498A324AED26111DD1B16DB"
         "OwnerKey" = "8:_5C0405D897084936B71D0B47752E6919"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -83,6 +107,12 @@
         {
         "MsmKey" = "8:_84719193C428260305B38C7C7C90D67A"
         "OwnerKey" = "8:_5C0405D897084936B71D0B47752E6919"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_84719193C428260305B38C7C7C90D67A"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -101,6 +131,18 @@
         {
         "MsmKey" = "8:_95846C20800C9DA2141DC55B26EF3DEE"
         "OwnerKey" = "8:_5C0405D897084936B71D0B47752E6919"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_95846C20800C9DA2141DC55B26EF3DEE"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -129,6 +171,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_D0293765C5C72ED5BD7F25CA49E0D7F3"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_D22E62A09BD24D019D89399FEFB41D4B"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -137,6 +185,12 @@
         {
         "MsmKey" = "8:_DD3A5D123BDAA22542E4E7F574ED0994"
         "OwnerKey" = "8:_D0293765C5C72ED5BD7F25CA49E0D7F3"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_DD3A5D123BDAA22542E4E7F574ED0994"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -159,8 +213,20 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_EAB672E3F5B7C223CDBCC6294FA75B42"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_5C0405D897084936B71D0B47752E6919"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_96119812D6DB4B7D834C8894695A2246"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -744,6 +810,17 @@
                 {
                 }
             }
+            "{C7E34266-2C30-44B9-A9A3-4E394ABD6E18}:_124FA35D875F4FE58FA94EAEFC051C62"
+            {
+            "Name" = "8:#1927"
+            "AlwaysCreate" = "11:FALSE"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Property" = "8:GAC"
+                "Folders"
+                {
+                }
+            }
             "{994432C3-9487-495D-8656-3E829A8DBDDE}:_3159940B70A94D5496C3F234017D6DBE"
             {
             "DefaultLocation" = "8:C:\\trace\\ArduinoFocuser"
@@ -807,7 +884,7 @@
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Arduino.Focuser"
         "ProductCode" = "8:{C326670A-A717-4467-9159-C2A4C1553982}"
-        "PackageCode" = "8:{AE782CCF-C7DF-4B68-8653-06A991071902}"
+        "PackageCode" = "8:{5DD62A23-7767-4376-861F-828089C0B88F}"
         "UpgradeCode" = "8:{6BA40FD1-50EB-444C-9017-A8D8A9C527E2}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
@@ -1368,6 +1445,34 @@
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_9418AFF8138248F0B5DBA436C9E7403C"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            "ProjectOutputGroupRegister" = "3:2"
+            "OutputConfiguration" = "8:"
+            "OutputGroupCanonicalName" = "8:Built"
+            "OutputProjectGuid" = "8:{DD8624FA-7E84-4364-80D0-2DAB637A3765}"
+            "ShowKeyOutput" = "11:TRUE"
+                "ExcludeFilters"
+                {
+                }
+            }
+            "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_96119812D6DB4B7D834C8894695A2246"
+            {
+            "SourcePath" = "8:..\\Focuser\\obj\\Debug\\ASCOM.Arduino.Focuser.dll"
+            "TargetName" = "8:"
+            "Tag" = "8:"
+            "Folder" = "8:_124FA35D875F4FE58FA94EAEFC051C62"
             "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"

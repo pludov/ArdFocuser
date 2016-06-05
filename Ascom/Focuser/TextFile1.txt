@@ -1,0 +1,3 @@
+﻿ATTENTION : pour l'installation, il faut faire un regasm après le setup.
+
+RegAsm c:\program ...\ASCOM.Arduino.Focuser.dll

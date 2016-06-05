@@ -653,7 +653,28 @@ namespace ASCOM.Arduino
                 return false;
         }
 
-        public void setInitialPosition(int Position)
+        public void setFilterWheelCurrentFilter(int filter)
+        {
+            String command = "A" + filter + "#";
+            logMessage("AAF2.setFilterWheelCurrentFilter", "Sending: " + command);
+            string r = internalCommandString(command, true);
+            logMessage("AAF2.setFilterWheelCurrentFilter", "Received: " + r);
+            // FIXME: une exception ?
+        }
+
+        public short getFilterWheelCurrentFilter()
+        {
+            String command = "F#";
+            logMessage("AAF2.getFilterWheelCurrentFilter", "Sending: " + command);
+            string r = internalCommandString(command, true);
+            logMessage("AAF2.getFilterWheelCurrentFilter", "Received: " + r);
+            string[] w = r.Split(':');
+            string p = w[0].Substring(1);
+            logMessage("AAF2.getFilterWheelCurrentFilter", "Position = " + p);
+            return (short)Int32.Parse(p);
+        }
+
+        public void setInitialPosition(short Position)
         {
             string command = "I" + Position.ToString() + "#";
             logMessage("AAF2.setInitialPosition", "Sending: " + command);
