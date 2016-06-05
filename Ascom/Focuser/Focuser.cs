@@ -565,92 +565,108 @@ namespace ASCOM.Arduino
         {
         }
 
+        Object locker = new Object();
+
         public string internalCommandString(string command, bool raw)
         {
-            if (!clientSocket.Connected) {
-                throw new ASCOM.NotConnectedException();
-            }
             logMessage("AAF2.CommandString", "------------------ Start -----------------------");
-            logMessage("AAF2.CommandString", "Command = " + command);
-            logMessage("AAF2.CommandString", "Transmitting:" + command);
-            NetworkStream serverStream = clientSocket.GetStream();
-            byte[] outStream = System.Text.Encoding.GetEncoding(28591).GetBytes(command);
-            serverStream.Write(outStream, 0, outStream.Length);
-            serverStream.Flush();
-            // Moved to socket: serialPort.Transmit(command);
-            // Moved to socket: System.Threading.Thread.Sleep(250);
-            logMessage("AAF2.CommandString", "Getting Return Message");
-
-            // Moved to socket:  string result = serialPort.ReceiveTerminated("#");
-            int b;
-            string result = "";
-            do
+            lock (locker)
             {
-                b = serverStream.ReadByte();
-                if (b == -1)
+                if (!clientSocket.Connected)
                 {
-                    throw new Exception("disonnected");
+                    throw new ASCOM.NotConnectedException();
                 }
-                if ((char)b == '#') {
-                    break;
-                }
-                result += (char)b;
-            } while(true);
-            logMessage("AAF2.CommandString", "Return Message = " + result);
+                logMessage("AAF2.CommandString", "Command = " + command);
+                logMessage("AAF2.CommandString", "Transmitting:" + command);
+                NetworkStream serverStream = clientSocket.GetStream();
+                byte[] outStream = System.Text.Encoding.GetEncoding(28591).GetBytes(command);
+                serverStream.Write(outStream, 0, outStream.Length);
+                serverStream.Flush();
 
-            if (result.StartsWith("ERR")) {
-                throw new ASCOM.DriverException("Order failed");
+                // Wait for a corresponding message in queue
+
+                logMessage("AAF2.CommandString", "Getting Return Message");
+
+                // Moved to socket:  string result = serialPort.ReceiveTerminated("#");
+                int b;
+                string result = "";
+                do
+                {
+                    b = serverStream.ReadByte();
+                    if (b == -1)
+                    {
+                        throw new Exception("disonnected");
+                    }
+                    if ((char)b == '#')
+                    {
+                        break;
+                    }
+                    result += (char)b;
+                } while (true);
+                logMessage("AAF2.CommandString", "Return Message = " + result);
+
+                if (result.StartsWith("ERR"))
+                {
+                    throw new ASCOM.DriverException("Order failed");
+                }
+
+                logMessage("AAF2.CommandString", "------------------ Finish ----------------------");
+                return result;
             }
-
-            logMessage("AAF2.CommandString", "------------------ Finish ----------------------");
-            return result;
         }
 
         public void connect()
         {
-            // try to connect to port
-            int tcpPort = driver.tcpPort;
-            if (tcpPort == -1)
+            lock (locker)
             {
-                tcpPort = 1501;
-            }
-            try
-            {
-                clientSocket.ReceiveTimeout = 10000;
-                clientSocket.SendTimeout = 10000;
-                // FIXME : le port
-                clientSocket.Connect("127.0.0.1", tcpPort);
-                
-                // Moved to socket: serialPort = new Serial();
-                // Moved to socket: serialPort.PortName = portName;
-                // Moved to socket: serialPort.Speed = SerialSpeed.ps9600;
-                // Moved to socket: serialPort.StopBits = SerialStopBits.One;
-                // Moved to socket: serialPort.ReceiveTimeout = 15;
-                // Moved to socket: serialPort.Connected = true;
-            }
-            catch (Exception ex)
-            {
-                throw new ASCOM.NotConnectedException("Tcp Connection error on port " + tcpPort + " - is ArduinoFocuserUI connected ?", ex);
-            }
+                // try to connect to port
+                int tcpPort = driver.tcpPort;
+                if (tcpPort == -1)
+                {
+                    tcpPort = 1051;
+                }
+                try
+                {
+                    clientSocket.ReceiveTimeout = 10000;
+                    clientSocket.SendTimeout = 10000;
+                    // FIXME : le port
+                    clientSocket.Connect("127.0.0.1", tcpPort);
 
-            // Moved to socket: System.Threading.Thread.Sleep(2000);    // Wait 2s for connection to settle
+                    // Moved to socket: serialPort = new Serial();
+                    // Moved to socket: serialPort.PortName = portName;
+                    // Moved to socket: serialPort.Speed = SerialSpeed.ps9600;
+                    // Moved to socket: serialPort.StopBits = SerialStopBits.One;
+                    // Moved to socket: serialPort.ReceiveTimeout = 15;
+                    // Moved to socket: serialPort.Connected = true;
+                }
+                catch (Exception ex)
+                {
+                    throw new ASCOM.NotConnectedException("Tcp Connection error on port " + tcpPort + " - is ArduinoFocuserUI connected ?", ex);
+                }
+            }
         }
 
         public void disconnect()
         {
-            // DMW disconnect from the device
-            clientSocket.Close();
-            // Moved to socket: serialPort.Connected = false;
-            // Moved to socket: serialPort.Dispose();
+            lock (locker)
+            {
+                // DMW disconnect from the device
+                clientSocket.Close();
+                // Moved to socket: serialPort.Connected = false;
+                // Moved to socket: serialPort.Dispose();
+            }
         }
 
         public bool isConnected()
         {
-            // Moved to socket: if (serialPort != null && serialPort.Connected)
-            if (clientSocket != null && clientSocket.Connected)
-                return true;
-            else
-                return false;
+            lock (locker)
+            {
+                // Moved to socket: if (serialPort != null && serialPort.Connected)
+                if (clientSocket != null && clientSocket.Connected)
+                    return true;
+                else
+                    return false;
+            }
         }
 
         public void setFilterWheelCurrentFilter(int filter)
