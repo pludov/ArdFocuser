@@ -1,7 +1,6 @@
 use <28BYJ-48.scad>;
 use <publicDomainGearV1.1.scad>;
 use <MCAD/shapes.scad>;
-include <din8.scad>;
 
 // conclusion 10 sept:
 // Haut: profondeur écrou +1.5mm, ou alors, dans le bas aussi
@@ -175,7 +174,7 @@ module roue_a_filtre() {
 }
 
 
-*roue_a_filtre();
+%roue_a_filtre();
 // Hall sensor
 module hallSensor() {
     color("grey")
@@ -242,7 +241,7 @@ module corps() {
 
 // La "grande roue"
 // projection()
-*translate([0,0, level_carroussel -gear_height ]) {
+translate([0,0, level_carroussel -gear_height ]) {
     color("red")
     difference()  {
         translate([0,0,gear_height / 2 + 0.1])
@@ -276,7 +275,7 @@ module StepMotor28BYJSurPatte() {
     StepMotor28BYJ();
 }
 // Le moteur
-*union() {
+%union() {
 translate([accroche_moteur_x, accroche_moteur_y, low_width + stepper_height])
     rotate([0,0,stepper_angle - 90])
     StepMotor28BYJSurPatte();
@@ -284,7 +283,7 @@ translate([accroche_moteur_x, accroche_moteur_y, low_width + stepper_height])
 
 
 // La petite roue
-*color("pink") {
+color("pink") {
 translate([accroche_moteur_x,accroche_moteur_y, 0])
     rotate([0, 0, stepper_angle])
     translate([35/2,-8, 0])
@@ -316,7 +315,7 @@ translate([accroche_moteur_x,accroche_moteur_y, 0])
 }
 
 // Le bas
-*color("green") {
+color("green") {
 difference() {
     intersection() {
         corps();
@@ -386,7 +385,7 @@ difference() {
 }
 
 // Le haut
-*rotate([180,0,0])
+translate([0,0,30])
 color("cyan")
 difference() {
     union() {
@@ -498,7 +497,7 @@ difference() {
 
 
 // Le capteur a effet hall
-*translate([0,
+%translate([0,
             -magnet_center_distance, 
             sensor_low_level])
 rotate([0, 0, opening_angle])
@@ -507,6 +506,41 @@ rotate([180, 0, 0])
 hallSensor();
 
 
+din_margin = 0.4;
+
+din_face_y = 15.7 + din_margin;
+din_back_y = 16.7 + din_margin;
+din_back_height_z_1 = 5.4;
+din_back_height_z_2 = 8;
+din_face_x = 15.3 + din_margin;
+din_z = 16.3;
+din_oreille_z_level = 11.1 - din_margin / 2;
+din_oreille_z = 1.3 + din_margin;
+din_oreille_marge_y = 0.8;
+din_oreille_x = (17.8 + 2 * din_margin - din_face_x) / 2;
+
+module din8()
+{
+    // x : width
+    // y : height
+    // z : profondeur
+    cube([din_face_x, din_face_y, din_z]);
+    hull() {
+        cube([din_face_x, din_back_y,din_back_height_z_1]);
+        translate([0, 0, din_back_height_z_2])
+        cube([din_face_x, din_face_y,0.1]);
+    }
+    translate([-din_oreille_x,din_oreille_marge_y, din_oreille_z_level])
+    cube([2 * din_oreille_x + din_face_x,
+        din_face_y - 2 * din_oreille_marge_y, din_oreille_z]);
+        
+
+
+    // Un espace pour les cable
+    color("blue")
+    translate([0,0,-12])
+    cube([din_face_x, din_back_y, 12]);
+}
 
 module din8pos()
 {
@@ -528,8 +562,8 @@ rotate([0, 90, 0])
 rotate([180,0, 0])
 translate([0, 0, -din_oreille_z_level])
 */
-*rotate([180,0,0])
-din8pos()
+
+*din8pos()
 din8();
 
 // Prise minidin8p
@@ -547,7 +581,7 @@ module capot_clip()
 }
 
 // Le capot
-rotate([180,0,0])
+translate([0,0,50])
 color("blue")
 render()
 difference() {
