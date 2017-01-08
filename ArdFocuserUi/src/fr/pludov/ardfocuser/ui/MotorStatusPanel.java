@@ -1,16 +1,12 @@
 package fr.pludov.ardfocuser.ui;
 
-import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.awt.*;
+import java.awt.event.*;
 
-import javax.swing.JButton;
+import javax.swing.*;
 
-import fr.pludov.ardfocus.utils.WeakListenerOwner;
-import fr.pludov.ardfocuser.driver.Focuser;
-import fr.pludov.ardfocuser.driver.FocuserRequest;
-import fr.pludov.ardfocuser.driver.FocuserStatus;
-import fr.pludov.ardfocuser.driver.IFocuserListener;
+import fr.pludov.ardfocus.utils.*;
+import fr.pludov.ardfocuser.driver.*;
 
 public class MotorStatusPanel extends MotorStatusPanelDesign {
 	Focuser focuser;
@@ -68,7 +64,7 @@ public class MotorStatusPanel extends MotorStatusPanelDesign {
 					return;
 				}
 				int currentPos = focuser.getMotorPosition();
-				int targetPos = currentPos + moveUnit;
+				int targetPos = currentPos + 4 * moveUnit;
 				if (targetPos < 0) {
 					targetPos = 0;
 				}

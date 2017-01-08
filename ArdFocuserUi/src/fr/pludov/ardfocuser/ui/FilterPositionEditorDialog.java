@@ -1,30 +1,16 @@
 package fr.pludov.ardfocuser.ui;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dialog;
-import java.awt.Frame;
-import java.awt.GraphicsConfiguration;
-import java.awt.Window;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 import java.util.List;
 
-import javax.swing.JDialog;
-import javax.swing.ListSelectionModel;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellEditor;
-import javax.swing.table.TableColumn;
+import javax.swing.*;
+import javax.swing.table.*;
 
-import fr.pludov.ardfocuser.driver.FilterDefinition;
-import fr.pludov.ardfocuser.driver.Focuser;
-import fr.pludov.ardfocuser.ui.util.ColorChooserEditor;
-import fr.pludov.ardfocuser.ui.util.ColorChooserRenderer;
-import fr.pludov.ardfocuser.ui.util.DialogUtils;
-import fr.pludov.ardfocuser.ui.util.DialogUtils.DialogValidator;
-
-import java.awt.FlowLayout;
+import fr.pludov.ardfocuser.driver.*;
+import fr.pludov.ardfocuser.ui.util.*;
+import fr.pludov.ardfocuser.ui.util.DialogUtils.*;
 
 public class FilterPositionEditorDialog extends JDialog {
 	FilterPositionEditorDesign editor;
@@ -108,7 +94,7 @@ public class FilterPositionEditorDialog extends JDialog {
 				int max = (Integer)tableModel.getValueAt(count - 1, 2);
 				
 				for(int i = 1; i < count - 1; ++i) {
-					int val = min + ((max - min) * i)/ count;
+					int val = min + ((max - min) * i)/ (count - 1);
 					tableModel.setValueAt(val, i, 2);
 				}
 			}
