@@ -1,33 +1,16 @@
 package fr.pludov.ardfocuser.ui;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemEvent;
-import java.awt.event.ItemListener;
-import java.util.ArrayList;
+import java.awt.*;
+import java.awt.event.*;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
 
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
-import javax.swing.ListCellRenderer;
+import javax.swing.*;
 
-import fr.pludov.ardfocus.utils.WeakListenerOwner;
-import fr.pludov.ardfocuser.driver.FilterDefinition;
-import fr.pludov.ardfocuser.driver.FilterWheelMotorStatus;
-import fr.pludov.ardfocuser.driver.Focuser;
-import fr.pludov.ardfocuser.driver.FocuserRequest;
-import fr.pludov.ardfocuser.driver.FocuserStatus;
-import fr.pludov.ardfocuser.driver.IFocuserListener;
-import fr.pludov.ardfocuser.ui.util.ColorContrast;
-import fr.pludov.ardfocuser.ui.util.DialogUtils;
-import net.miginfocom.swing.MigLayout;
+import fr.pludov.ardfocus.utils.*;
+import fr.pludov.ardfocuser.driver.*;
+import fr.pludov.ardfocuser.ui.util.*;
+import net.miginfocom.swing.*;
 
 public class FilterWheelPanel extends FilterWheelPanelDesign {
 	final Focuser focuser;
@@ -38,6 +21,14 @@ public class FilterWheelPanel extends FilterWheelPanelDesign {
 		@Override
 		public String toString() {
 			return "Calibration...";
+		}
+	}
+	
+	private class GotoItem {
+		
+		@Override
+		public String toString() {
+			return "Aller à...";
 		}
 	}
 	
@@ -84,7 +75,9 @@ public class FilterWheelPanel extends FilterWheelPanelDesign {
 			@Override
 			public void itemStateChanged(ItemEvent e) {
 				
-				
+				if (e.getStateChange() != ItemEvent.SELECTED) {
+					return;
+				}
 				if (changeFilterComboBox.getSelectedIndex() != 0) {
 					Object selectedItem = changeFilterComboBox.getSelectedItem();
 					if (selectedItem == null) {
@@ -115,6 +108,45 @@ public class FilterWheelPanel extends FilterWheelPanelDesign {
 							}
 						};
 						FilterWheelPanel.this.focuser.queueRequest(request, false);
+					}
+					
+					if (selectedItem instanceof GotoItem) {
+						SwingUtilities.invokeLater(new Runnable() {
+							@Override
+							public void run() {
+								int targetPos = FilterWheelPanel.this.focuser.getFilterWheelPosition();
+								
+							    String posStr = JOptionPane.showInputDialog(SwingUtilities.getWindowAncestor(FilterWheelPanel.this), "Position?", Integer.toString(targetPos));
+							    if (posStr != null) {
+							    	targetPos = Integer.parseInt(posStr);
+							    	// demander la calibration
+									FocuserRequest request = new FocuserRequest("F" + targetPos) {
+										
+										@Override
+										public void onStarted() {
+										}
+										
+										@Override
+										public void onReply(String reply) {
+											// FIXME: détecter un code d'erreur
+										}
+										
+										@Override
+										public void onError(String cause) {
+											// FIXME: détecter un code d'erreur
+										}
+										
+										@Override
+										public void onCanceled(String cause) {
+										}
+									};
+									FilterWheelPanel.this.focuser.queueRequest(request, false);
+							    	
+							    }
+							}
+						});
+
+						
 					}
 					
 					if (selectedItem instanceof CalibrationItem) {
@@ -241,6 +273,7 @@ public class FilterWheelPanel extends FilterWheelPanelDesign {
 				for(FilterDefinition fd : focuser.getFilterDefinitions()) {
 					this.changeFilterComboBox.addItem(fd);
 				}
+				this.changeFilterComboBox.addItem(new GotoItem());
 			case FailedCalibration:
 				this.changeFilterComboBox.addItem(new CalibrationItem());
 				break;
